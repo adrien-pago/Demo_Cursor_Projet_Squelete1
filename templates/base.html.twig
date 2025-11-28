@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}Starter Auth{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  {% block stylesheets %}{% endblock %}
+  {% block head_extra %}{% endblock %}
+</head>
+<body class="d-flex flex-column min-vh-100">
+<nav class="navbar navbar-expand-lg navbar-light">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="{{ path('app_home') }}">Starter</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <div class="ms-auto ms-lg-auto d-flex align-items-center flex-wrap gap-2 justify-content-center justify-content-lg-end">
+        {% if app.user %}
+          <span class="me-3 text-muted d-none d-md-inline">Bonjour <strong>{{ app.user.userIdentifier }}</strong></span>
+          <a class="btn btn-outline-secondary btn-sm" href="{{ path('app_logout') }}">Logout</a>
+        {% else %}
+          <a class="btn btn-primary btn-sm" href="{{ path('app_login') }}">Login</a>
+          <a class="btn btn-outline-primary btn-sm" href="{{ path('app_register') }}">Register</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</nav>
+<main class="container flex-grow-1 min-h-70vh py-5">
+  {% block body %}{% endblock %}
+</main>
+<footer class="border-top mt-auto">
+  <div class="container py-4">
+    <div class="text-center small text-muted">© {{ "now"|date("Y") }} Starter. Tous droits réservés.</div>
+  </div>
+</footer>
+{% block javascripts %}{% endblock %}
+</body>
+</html>
+

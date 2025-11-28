@@ -1,0 +1,23 @@
+{
+  "name": "symfony-auth-skeleton",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "npx encore dev",
+    "watch": "npx encore dev --watch",
+    "build": "npx encore production"
+  },
+  "devDependencies": {
+    "@symfony/webpack-encore": "^4.5.0",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.47",
+    "postcss-loader": "^7.3.4",
+    "sass": "^1.80.0",
+    "sass-loader": "^14.2.1"
+  },
+  "dependencies": {
+    "@popperjs/core": "^2.11.8",
+    "bootstrap": "^5.3.3"
+  }
+}
+

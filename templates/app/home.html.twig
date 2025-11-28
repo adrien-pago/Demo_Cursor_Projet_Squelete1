@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Home{% endblock %}
+
+{% block stylesheets %}{{ encore_entry_link_tags('app-home') }}{% endblock %}
+
+{% block body %}
+
+<section class="hero text-center">
+  <h1 class="display-6 mb-3">Bienvenue 👋</h1>
+  <p class="lead text-muted">Squelette Symfony réutilisable (login/register) avec assets modulaires.</p>
+</section>
+
+{% endblock %}
+
+{% block javascripts %}{{ encore_entry_script_tags('app-home') }}{% endblock %}
+
