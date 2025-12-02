@@ -66,37 +66,40 @@
 - `password` (string, hashé)
 - `compteVerif` (boolean, compte vérifié)
 - `adminVerif` (boolean, admin vérifié)
-- `balance` (decimal, solde du compte - calculé depuis Wallet)
+- `balance` (decimal, solde du compte - maintenu à jour via Wallet)
 - Relation : `OneToMany` vers `Wallet`
 - Relation : `OneToMany` vers `Reservation`
+- **Méthode** : `getBalance()` - retourne le solde actuel (calculé depuis la dernière transaction Wallet)
 
 ## 2. Wallet (nouvelle entité)
 - `id` (integer, auto, Primary Key)
 - `user` (ManyToOne vers User)
+- `type` (string, enum: 'credit', 'debit', 'refund')
 - `soldeNew` (decimal, nouveau solde après transaction)
 - `soldeOld` (decimal, ancien solde avant transaction)
+- `amount` (decimal, montant de la transaction - positif pour crédit/remboursement, négatif pour débit)
 - `date` (datetime_immutable, date de la transaction)
-- `statut` (string, enum: 'payement accepté', 'payement refusé', 'payement en cours')
-- `montantRecharge` (decimal, montant de la recharge)
-- Relation : Historique des transactions de crédit
+- `statut` (string, enum: 'payement accepté', 'payement refusé')
+- `description` (string, nullable, description de la transaction)
+- Relation : Historique des transactions (crédit, débit, remboursement)
 
 ## 3. Entree (nouvelle entité)
 - `id` (integer, auto, Primary Key)
-- `typeChoix` (ManyToOne vers TypeChoix)
+- `typeChoix` (ManyToOne vers TypeChoix, nullable)
 - `name` (string, nom de l'entrée)
 - `description` (text, description)
 - Relation : `OneToMany` vers `CompositionEntree`
 
 ## 4. Plat (nouvelle entité)
 - `id` (integer, auto, Primary Key)
-- `typeChoix` (ManyToOne vers TypeChoix)
+- `typeChoix` (ManyToOne vers TypeChoix, nullable)
 - `name` (string, nom du plat)
 - `description` (text, description)
 - Relation : `OneToMany` vers `CompositionPlat`
 
 ## 5. Accompagnement (nouvelle entité)
 - `id` (integer, auto, Primary Key)
-- `typeChoix` (ManyToOne vers TypeChoix)
+- `typeChoix` (ManyToOne vers TypeChoix, nullable)
 - `name` (string, nom de l'accompagnement)
 - `description` (text, description)
 - Relation : `OneToMany` vers `CompositionAccompagnement`
@@ -106,19 +109,20 @@
 - `typeChoix` (ManyToOne vers TypeChoix, nullable)
 - `name` (string, nom du dessert)
 - `description` (text, description)
-- Relation : `OneToMany` vers `CompositionDessert` (si nécessaire)
+- Relation : `OneToMany` vers `CompositionDessert`
 
 ## 7. Salade (nouvelle entité)
 - `id` (integer, auto, Primary Key)
-- `typeChoix` (ManyToOne vers TypeChoix)
+- `typeChoix` (ManyToOne vers TypeChoix, nullable)
 - `name` (string, nom de la salade)
 - `description` (text, description)
 - Relation : `OneToMany` vers `CompositionSalade`
 
-## 8. TypeChoix (nouvelle entité)
+## 8. TypeChoix (nouvelle entité - optionnelle)
 - `id` (integer, auto, Primary Key)
-- `name` (string, nom du type de choix)
-- Relation : `OneToMany` vers `Entree`, `Plat`, `Accompagnement`, `Salade`
+- `name` (string, nom du type de choix, ex: 'végétarien', 'sans gluten', 'bio')
+- Relation : `OneToMany` vers `Entree`, `Plat`, `Accompagnement`, `Salade`, `Dessert`
+- **Note** : Permet de catégoriser les plats (optionnel, peut être nullable)
 
 ## 9. Formule (nouvelle entité)
 - `id` (integer, auto, Primary Key)
@@ -140,6 +144,7 @@
 ## 12. CarteDuJour (nouvelle entité - Menu du jour)
 - `id` (integer, auto, Primary Key)
 - `date` (date, unique, date du menu)
+- `price` (decimal, prix fixe du menu - même prix pour salade et menu complet, ex: 4.50€)
 - `locked` (boolean, date verrouillée - non modifiable)
 - `comment` (text, nullable, commentaire affiché à la place du menu)
 - `available` (boolean, menu disponible pour réservation)
@@ -148,9 +153,11 @@
 - Relation : `OneToMany` vers `CompositionEntree`
 - Relation : `OneToMany` vers `CompositionPlat`
 - Relation : `OneToMany` vers `CompositionAccompagnement`
+- Relation : `OneToMany` vers `CompositionDessert`
 - Relation : `OneToMany` vers `CompositionSalade`
 - Relation : `OneToMany` vers `CompositionFormule`
 - Relation : `OneToMany` vers `CompositionLieu`
+- Relation : `OneToMany` vers `Reservation`
 
 ## 13. CompositionEntree (table de liaison)
 - `id` (integer, auto, Primary Key)
@@ -169,6 +176,12 @@
 - `carteDuJour` (ManyToOne vers CarteDuJour)
 - `accompagnement` (ManyToOne vers Accompagnement)
 - Relation : Permet de lier plusieurs accompagnements à un menu du jour
+
+## 15b. CompositionDessert (table de liaison)
+- `id` (integer, auto, Primary Key)
+- `carteDuJour` (ManyToOne vers CarteDuJour)
+- `dessert` (ManyToOne vers Dessert)
+- Relation : Permet de lier plusieurs desserts à un menu du jour
 
 ## 16. CompositionSalade (table de liaison)
 - `id` (integer, auto, Primary Key)
@@ -192,17 +205,24 @@
 ## 19. Reservation (nouvelle entité - Commande)
 - `id` (integer, auto, Primary Key)
 - `user` (ManyToOne vers User)
-- `entree` (ManyToOne vers Entree, nullable)
-- `plat` (ManyToOne vers Plat, nullable)
-- `accompagnement` (ManyToOne vers Accompagnement, nullable)
-- `salade` (ManyToOne vers Salade, nullable)
+- `carteDuJour` (ManyToOne vers CarteDuJour, le menu du jour réservé)
+- `entree` (ManyToOne vers Entree, nullable, sélectionnée par l'utilisateur si menu complet)
+- `plat` (ManyToOne vers Plat, nullable, sélectionné par l'utilisateur si menu complet)
+- `accompagnement` (ManyToOne vers Accompagnement, nullable, sélectionné par l'utilisateur si menu complet)
+- `dessert` (ManyToOne vers Dessert, nullable, sélectionné par l'utilisateur si menu complet)
+- `salade` (ManyToOne vers Salade, nullable, sélectionnée par l'utilisateur si formule salade)
 - `formule` (ManyToOne vers Formule)
 - `lieu` (ManyToOne vers Lieu, mode de livraison)
 - `statutCommande` (ManyToOne vers StatutCommande)
+- `price` (decimal, prix payé - récupéré depuis CarteDuJour.price au moment de la réservation)
 - `date` (date, date de réservation)
 - `createdAt` (datetime_immutable)
 - `updatedAt` (datetime_immutable)
-- **Note** : Une réservation peut être soit une salade (salade remplie), soit un menu complet (entrée + plat + accompagnement remplis)
+- **Note** : 
+  - Une réservation référence toujours un `carteDuJour` (menu du jour)
+  - Si formule = "salade" : champ `salade` rempli, autres champs null
+  - Si formule = "menu complet" : champs `entree`, `plat`, `accompagnement`, `dessert` remplis, `salade` null
+  - Le prix est toujours celui du `carteDuJour.price` (prix fixe, ex: 4.50€)
 
 ---
 
@@ -210,20 +230,11 @@
 
 ## Routes Salariés (ROLE_EMPLOYEE)
 
-### Dashboard Salarié
-- **Route** : `/employee/dashboard`
-- **Contrôleur** : `EmployeeController::dashboard()`
-- **Fonctionnalité** : Affiche le solde, les repas disponibles, les dernières réservations
-
-### Créditer le compte
-- **Route** : `/employee/credit` (GET/POST)
-- **Contrôleur** : `EmployeeController::credit()`
-- **Fonctionnalité** : Formulaire pour ajouter de l'argent au compte
-
 ### Écran d'accueil (Dashboard)
 - **Route** : `/employee/dashboard`
 - **Contrôleur** : `EmployeeController::dashboard()`
 - **Fonctionnalité** : 
+  - Affiche le solde actuel de l'utilisateur
   - Affiche les menus du jour des journées à venir
   - Tuiles de dates cliquables pour accéder à la réservation
   - Tuiles avec réservation existante affichées différemment (couleur différente)
@@ -232,6 +243,11 @@
   - Swipe gauche sur une date : ouvre interface réservation avec formule menu sélectionné
   - Swipe droite sur une date : ouvre interface réservation avec formule salade sélectionné
   - Clic sur une date : accède à la page de réservation (ou modification si réservation existe)
+
+### Créditer le compte
+- **Route** : `/employee/credit` (GET/POST)
+- **Contrôleur** : `EmployeeController::credit()`
+- **Fonctionnalité** : Formulaire pour ajouter de l'argent au compte
 
 ### Écran de réservation
 - **Route** : `/employee/reserve/{date}` (GET, affiche le formulaire)
@@ -351,6 +367,14 @@
 ### Marquer réservation comme servie
 - **Route** : `/chef/reservation/{id}/mark-served` (POST)
 - **Contrôleur** : `ChefController::markServed()`
+
+### Paramètres d'administration
+- **Route** : `/chef/settings` (GET/POST)
+- **Contrôleur** : `ChefController::settings()`
+- **Fonctionnalité** : 
+  - Configurer les modes de livraison par défaut (lieux)
+  - Configurer les types de cartes disponibles (Formule)
+  - Gérer les paramètres généraux
 
 ---
 
@@ -556,42 +580,47 @@ Ajouter les nouvelles entries :
 # RÈGLES MÉTIER
 
 ## Crédit de compte
-- Un salarié peut créditer son compte avec n'importe quel montant positif
-- Chaque crédit crée une transaction de type 'credit'
-- Le solde est mis à jour automatiquement
+- Un salarié peut créditer son compte avec n'importe quel montant positif (entre 1€ et 1000€)
+- Chaque crédit crée une transaction Wallet avec `type = 'credit'` et `statut = 'payement accepté'`
+- Le solde User.balance est mis à jour automatiquement : `soldeNew = soldeOld + montantRecharge`
+- Une transaction Wallet est créée avec les valeurs `soldeOld` (solde avant) et `soldeNew` (solde après)
 
 ## Réservation de menu
-- Un salarié ne peut réserver que si son solde est suffisant
+- Un salarié ne peut réserver que si son solde est suffisant (solde >= CarteDuJour.price)
+- Le prix est fixe et identique pour salade et menu complet (ex: 4.50€) - défini dans CarteDuJour.price
 - Le montant est débité immédiatement lors de la réservation (via Wallet)
-- Une transaction Wallet est créée avec statut 'payement accepté'
-- La réservation est créée avec le statut 'pending'
+- Une transaction Wallet est créée avec `type = 'debit'`, `statut = 'payement accepté'`, `amount = -CarteDuJour.price`
+- Le solde User.balance est mis à jour : `soldeNew = soldeOld - CarteDuJour.price`
+- La réservation est créée avec le statut 'pending' et `price = CarteDuJour.price`
 - Un salarié ne peut réserver qu'un menu disponible (available = true)
-- Un salarié réserve soit une salade (champ salade rempli), soit un menu complet (entrée + plat + accompagnement remplis)
+- Un salarié réserve soit une salade (champ `salade` rempli, formule = "salade"), soit un menu complet (champs `entree`, `plat`, `accompagnement`, `dessert` remplis, formule = "menu complet")
+- Pour un menu complet, le salarié doit sélectionner UNE entrée parmi celles disponibles, UN plat, UN accompagnement, UN dessert
 - Le choix du mode de livraison (lieu) est obligatoire
 - Il ne peut y avoir qu'un seul menu du jour (CarteDuJour) par date
 - Une date verrouillée (locked = true) ne peut pas être modifiée
 
 ## Annulation de réservation
 - Un salarié peut annuler sa réservation uniquement si le statut est 'pending' ou 'confirmed'
-- Le montant est remboursé sur le compte
-- Une transaction de type 'credit' est créée pour le remboursement
+- Le montant est remboursé sur le compte (Reservation.price)
+- Une transaction Wallet est créée avec `type = 'refund'`, `statut = 'payement accepté'`, `amount = Reservation.price`
+- Le solde User.balance est mis à jour : `soldeNew = soldeOld + Reservation.price`
 - Le statut de la réservation passe à 'cancelled'
 
 ## Gestion des éléments de repas (Chef)
 - Le chef peut créer/modifier/supprimer des **entrées**, **plats**, **accompagnements**, **desserts**, **salades**
-- Chaque élément a un type (`starter`, `main`, `side`, `dessert`, `salad`)
+- Les éléments n'ont PAS de prix individuel (seul le menu du jour a un prix fixe)
+- Chaque élément peut avoir un `typeChoix` optionnel (ex: 'végétarien', 'sans gluten') pour catégorisation
 - Un élément supprimé ne peut plus être utilisé dans la composition d'un menu
-- Un élément peut être désactivé (available = false) sans être supprimé
 - Les éléments sont réutilisables : le même plat peut être utilisé dans plusieurs menus du jour différents
 
 ## Composition du menu du jour (Chef)
 - Le chef compose le menu du jour en choisissant parmi les éléments qu'il a créés
-- **Deux types de menus possibles** :
-  1. **Salade** : Sélection d'une seule salade parmi les salades créées
-  2. **Menu complet** : Sélection d'une entrée, d'un plat, d'un accompagnement, d'un dessert
-- Il ne peut y avoir qu'**un seul menu du jour par date**
-- Le prix du menu complet est la somme des prix des éléments sélectionnés (ou un prix fixe défini par le chef)
-- Le prix d'une salade est le prix de la salade sélectionnée
+- **Deux types de formules possibles** (gérées via CompositionFormule) :
+  1. **Salade** : Le chef sélectionne une ou plusieurs salades disponibles (via CompositionSalade)
+  2. **Menu complet** : Le chef sélectionne une ou plusieurs entrées, plats, accompagnements, desserts disponibles
+- Il ne peut y avoir qu'**un seul menu du jour (CarteDuJour) par date**
+- **Le prix est fixe** : Le chef définit un prix unique pour le menu du jour (CarteDuJour.price, ex: 4.50€)
+- Ce prix s'applique à TOUTES les formules (salade ET menu complet) pour cette date
 - Le chef peut créer/modifier/supprimer les menus du jour
 - Un menu du jour peut être désactivé (available = false) sans être supprimé
 
@@ -599,15 +628,16 @@ Ajouter les nouvelles entries :
 1. **Création des éléments** : Le chef crée d'abord tous les éléments (entrées, plats, accompagnements, desserts, salades)
 2. **Création du menu du jour** :
    - Le chef choisit une date pour le menu
-   - Le chef choisit le type : "Salade" OU "Menu complet"
-   - **Si type = "Salade"** : Sélection d'une salade parmi les salades disponibles
-   - **Si type = "Menu complet"** :
-     - Sélection d'une entrée parmi les entrées disponibles
-     - Sélection d'un plat parmi les plats disponibles
-     - Sélection d'un accompagnement parmi les accompagnements disponibles
-     - Sélection d'un dessert parmi les desserts disponibles
-3. **Calcul du prix** : Le prix est calculé automatiquement (somme des éléments) ou peut être défini manuellement
-4. **Activation** : Le menu est activé (available = true) pour être visible et réservable par les salariés
+   - Le chef définit le prix fixe du menu (ex: 4.50€) - même prix pour toutes les formules
+   - Le chef active les formules disponibles (salade et/ou menu complet) via CompositionFormule
+   - **Pour la formule salade** : Le chef sélectionne une ou plusieurs salades disponibles (via CompositionSalade)
+   - **Pour la formule menu complet** :
+     - Le chef sélectionne une ou plusieurs entrées disponibles (via CompositionEntree)
+     - Le chef sélectionne un ou plusieurs plats disponibles (via CompositionPlat)
+     - Le chef sélectionne un ou plusieurs accompagnements disponibles (via CompositionAccompagnement)
+     - Le chef sélectionne un ou plusieurs desserts disponibles (via CompositionDessert)
+   - Le salarié choisira ensuite UN élément de chaque catégorie lors de sa réservation
+3. **Activation** : Le menu est activé (available = true) pour être visible et réservable par les salariés
 
 ## Gestion des menus du jour (Chef)
 - Le chef compose le menu du jour via l'agenda
@@ -704,13 +734,13 @@ Ajouter les nouvelles entries :
 
 ## Validation des formulaires
 - Montant de crédit : minimum 1€, maximum 1000€
-- Prix d'un élément de repas : minimum 0.50€, maximum 50€
-- Prix d'un menu du jour : minimum 1€, maximum 100€
+- Prix d'un menu du jour (CarteDuJour.price) : minimum 0.50€, maximum 50€
 - Date de réservation : ne peut pas être dans le passé
-- Date du menu du jour : ne peut pas être dans le passé
-- Vérification du solde avant réservation
-- Un menu du jour ne peut pas être créé pour une date déjà existante
-- Lors de la composition d'un menu complet, tous les éléments requis doivent être sélectionnés (entrée, plat, accompagnement, dessert)
+- Date du menu du jour : peut être créé pour aujourd'hui et jours futurs uniquement
+- Vérification du solde avant réservation : solde >= CarteDuJour.price
+- Un menu du jour ne peut pas être créé pour une date déjà existante (contrainte unique sur date)
+- Lors de la composition d'un menu complet, au moins un élément de chaque catégorie doit être sélectionné (au moins une entrée, un plat, un accompagnement, un dessert)
+- Lors de la réservation d'un menu complet, le salarié doit sélectionner exactement UN élément de chaque catégorie disponible
 
 ## Sécurité
 - CSRF protection sur tous les formulaires
@@ -726,36 +756,41 @@ Ajouter les nouvelles entries :
 - Admin/Chef : `admin@test.com` / `Admin123!` (ROLE_CHEF, adminVerif: true)
 - Salarié : `user@test.com` / `User123!` (ROLE_EMPLOYEE, compteVerif: true, solde: 50€)
 
-## Éléments de repas de test
+## Éléments de repas de test (sans prix - les prix sont au niveau du menu)
 
 ### Entrées
-- Salade verte (3.50€)
-- Soupe du jour (2.50€)
-- Velouté de légumes (3.00€)
+- Salade verte
+- Soupe du jour
+- Velouté de légumes
 
 ### Plats
-- Poulet rôti (8.50€)
-- Saumon grillé (9.50€)
-- Lasagnes (7.50€)
+- Poulet rôti
+- Saumon grillé
+- Lasagnes
 
 ### Accompagnements
-- Riz (2.00€)
-- Frites (2.50€)
-- Légumes de saison (2.50€)
+- Riz
+- Frites
+- Légumes de saison
 
 ### Desserts
-- Tarte aux pommes (4.00€)
-- Mousse au chocolat (3.50€)
-- Salade de fruits (3.00€)
+- Tarte aux pommes
+- Mousse au chocolat
+- Salade de fruits
 
 ### Salades
-- Salade César (6.00€)
-- Salade niçoise (6.50€)
-- Salade composée (5.50€)
+- Salade César
+- Salade niçoise
+- Salade composée
 
 ## Menus du jour de test
-- Menu du 01/01/2024 : Salade César (6.00€)
-- Menu du 02/01/2024 : Entrée (Salade verte) + Plat (Poulet rôti) + Accompagnement (Riz) + Dessert (Tarte aux pommes) = 18.00€
+- Menu du 01/01/2024 : Prix 4.50€
+  - Formule salade : Salade César, Salade niçoise disponibles
+  - Formule menu complet : Entrées (Salade verte, Soupe), Plats (Poulet rôti, Saumon), Accompagnements (Riz, Frites), Desserts (Tarte aux pommes, Mousse)
+  
+- Menu du 02/01/2024 : Prix 4.50€
+  - Formule salade : Salade composée disponible
+  - Formule menu complet : Entrées (Velouté), Plats (Lasagnes), Accompagnements (Légumes de saison), Desserts (Salade de fruits)
 
 ---
 
@@ -805,6 +840,7 @@ src/
     ├── CompositionEntreeRepository.php (nouveau)
     ├── CompositionPlatRepository.php (nouveau)
     ├── CompositionAccompagnementRepository.php (nouveau)
+    ├── CompositionDessertRepository.php (nouveau)
     ├── CompositionSaladeRepository.php (nouveau)
     ├── CompositionFormuleRepository.php (nouveau)
     ├── CompositionLieuRepository.php (nouveau)
@@ -814,26 +850,40 @@ templates/
 ├── employee/
 │   ├── dashboard.html.twig
 │   ├── credit.html.twig
-│   ├── menus.html.twig
+│   ├── reserve.html.twig
+│   ├── reserve-salad.html.twig
+│   ├── meal-details.html.twig
+│   ├── mess.html.twig
 │   └── reservations.html.twig
 ├── chef/
-│   ├── dashboard.html.twig
-│   ├── meal-items/
-│   │   ├── index.html.twig
-│   │   ├── by-type.html.twig
-│   │   ├── new.html.twig
-│   │   └── edit.html.twig
-│   ├── daily-menus/
+│   ├── agenda.html.twig
+│   ├── menu-day.html.twig
+│   ├── manage-meals.html.twig
+│   ├── entrees/
 │   │   ├── index.html.twig
 │   │   ├── new.html.twig
 │   │   └── edit.html.twig
-│   └── reservations/
-│       ├── index.html.twig
-│       └── details.html.twig
+│   ├── plats/
+│   │   ├── index.html.twig
+│   │   ├── new.html.twig
+│   │   └── edit.html.twig
+│   ├── accompagnements/
+│   │   ├── index.html.twig
+│   │   ├── new.html.twig
+│   │   └── edit.html.twig
+│   ├── salades/
+│   │   ├── index.html.twig
+│   │   ├── new.html.twig
+│   │   └── edit.html.twig
+│   ├── reservations/
+│   │   ├── index.html.twig
+│   │   └── details.html.twig
+│   └── settings.html.twig
 └── shared/
-    ├── meal_item_card.html.twig
-    ├── daily_menu_card.html.twig
-    └── reservation_card.html.twig
+    ├── date_tile.html.twig
+    ├── meal_card.html.twig
+    ├── delivery_mode_icons.html.twig
+    └── modal_meal_details.html.twig
 
 assets/
 ├── employee/
