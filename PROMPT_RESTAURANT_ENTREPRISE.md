@@ -202,7 +202,20 @@
 - `active` (boolean, mode de livraison actif pour ce jour)
 - Relation : Permet de gérer les modes de livraison par jour
 
-## 19. Reservation (nouvelle entité - Commande)
+## 19. MessRequest (nouvelle entité)
+- `id` (integer, auto, Primary Key)
+- `user` (ManyToOne vers User)
+- `date` (date, date de la demande)
+- `nombreConvives` (integer, nullable, nombre de convives)
+- `petitDejeuner` (boolean, petit déjeuner demandé)
+- `dejeuner` (boolean, déjeuner demandé)
+- `pauses` (boolean, pauses demandées)
+- `diner` (boolean, dîner demandé)
+- `commentaires` (text, nullable, commentaires supplémentaires)
+- `sentAt` (datetime_immutable, date d'envoi de la demande)
+- **Note** : Permet de tracker les demandes de mess pour éviter les doublons
+
+## 20. Reservation (nouvelle entité - Commande)
 - `id` (integer, auto, Primary Key)
 - `user` (ManyToOne vers User)
 - `carteDuJour` (ManyToOne vers CarteDuJour, le menu du jour réservé)
@@ -282,7 +295,12 @@
 ### Mes réservations
 - **Route** : `/employee/reservations`
 - **Contrôleur** : `EmployeeController::reservations()`
-- **Fonctionnalité** : Historique des réservations de l'utilisateur
+- **Fonctionnalité** : 
+  - Tableau moderne avec 4 colonnes : Date, Formule, Lieu, Prix
+  - Affichage du solde actuel
+  - Bouton "Recharger le solde" en bas
+  - Design responsive (tableau plus large sur PC)
+  - Remplacement "Formule restaurant" par "Restaurant" et "Formule salade" par "Salade" dans l'affichage
 
 ### Annuler une réservation
 - **Route** : `/employee/reservation/{id}/cancel` (POST)
@@ -335,6 +353,26 @@
   - Annulation avec bouton orange
   - Flèches autour de la date pour changer de date
   - Icône appareil photo pour aperçu consommateur
+
+### Sélection des salades pour un jour
+- **Route** : `/chef/select-salades/{date}` (GET, affiche la liste)
+- **Route** : `/chef/select-salades/{date}` (POST, valide les sélections)
+- **Contrôleur** : `ChefController::selectSalades()`
+- **Fonctionnalité** : 
+  - Affichage de toutes les salades existantes
+  - Sélection/désélection par clic
+  - Création de nouvelles salades via modal
+  - Validation avec boutons modernes
+
+### Sélection menu complet pour un jour
+- **Route** : `/chef/select-menu-complet/{date}` (GET, affiche la liste)
+- **Route** : `/chef/select-menu-complet/{date}` (POST, valide les sélections)
+- **Contrôleur** : `ChefController::selectMenuComplet()`
+- **Fonctionnalité** : 
+  - Affichage des entrées, plats, accompagnements existants
+  - Sélection/désélection par clic
+  - Création de nouveaux éléments via modal
+  - Validation avec boutons modernes
 
 ### Gestion des éléments de repas (CRUD)
 - **Route** : `/chef/entrees` (GET, liste des entrées)
@@ -413,9 +451,10 @@ Ajouter les champs manquants et les relations.
 - `templates/employee/reservations.html.twig` (historique des réservations)
 
 ## Templates Chef
-- `templates/chef/agenda.html.twig` (écran agenda)
+- `templates/chef/agenda.html.twig` (écran agenda avec bandeaux mois et cartes jours)
 - `templates/chef/menu-day.html.twig` (proposition d'un jour - création/modification)
-- `templates/chef/manage-meals.html.twig` (gestion des plats pour un jour)
+- `templates/chef/select-salades.html.twig` (sélection des salades pour un jour)
+- `templates/chef/select-menu-complet.html.twig` (sélection des entrées, plats, accompagnements pour un jour)
 - `templates/chef/entrees/index.html.twig` (liste des entrées)
 - `templates/chef/entrees/new.html.twig` (créer une entrée)
 - `templates/chef/entrees/edit.html.twig` (modifier une entrée)
@@ -442,94 +481,157 @@ Ajouter les champs manquants et les relations.
 
 # INTERFACES DÉTAILLÉES
 
-## Interface Salarié - Écran d'accueil
+## Interface Salarié - Écran d'accueil (Dashboard)
 
-### Sans réservation
-- Affichage des menus du jour des journées à venir
-- Tuiles de dates cliquables
+- **Structure** :
+  - Bandeaux de mois avec dégradé vert (pas bleu foncé)
+  - Cartes de jours organisées par mois
+  - Affichage des 60 prochains jours par défaut
+- **Affichage par date** :
+  - Date et jour de la semaine à gauche (même hauteur que le contenu)
+  - Contenu au centre :
+    - "Entrées: [liste]" sur une ligne (label bleu, items noirs)
+    - "Plats: [liste]" sur une ligne
+    - "Accompagnements: [liste]" sur une ligne
+    - Les items peuvent revenir à la ligne sous le label si trop longs
+  - Filigrane "RÉSERVÉ" en diagonal pour les jours avec réservation existante
+- **États visuels** :
+  - Jour configuré : affichage des éléments du menu
+  - Jour fermé (commentaire) : affichage du commentaire
+  - Jour non configuré : "Non configuré"
 - **Interactions** :
-  - Clic sur une date → Ouvre interface réservation
-  - Swipe gauche sur une date → Ouvre interface réservation avec formule menu sélectionné
-  - Swipe droite sur une date → Ouvre interface réservation avec formule salade sélectionné
-
-### Avec réservations
-- Tuiles avec réservation affichées dans une couleur différente
-- Affichage des plats réservés sur la tuile
-- Icône représentant le mode de livraison
-- Clic sur une date → Accède à la page de réservation pour modification (si autorisé)
-- Cadenas pour les dates non modifiables
+  - Clic sur une carte → Accès à la page de réservation
+  - Navigation fluide entre les dates
 
 ## Interface Salarié - Écran de réservation
 
-### Formule restaurant
-- Par défaut : plats du jour affichés
-- Premier plat de la liste sélectionné par défaut
-- Clic pour changer de plat
-- Clic pour basculer sur formule salade
-- Choix du type de livraison : icônes en bas de page
-- Clic sur icône livraison → Valide automatiquement la réservation et renvoie à l'écran d'accueil
-- Flèches autour de la date pour changer de date sans revenir en arrière
-- Croix orange pour revenir à l'écran d'accueil
-- Icône 'i' pour accéder aux informations complémentaires sur le plat (composition)
-
-### Formule salade
-- Premier plat de la liste sélectionné par défaut
-- Clic pour changer de plat
-- Clic pour basculer sur formule restaurant
-- Choix du type de livraison : icônes en bas
-- Clic sur icône livraison → Valide automatiquement la réservation
-- Flèches autour de la date pour changer de date
-- Croix orange pour revenir à l'écran d'accueil
-- Icône 'i' pour détails du plat
-
-### Détails des plats (Pop-up)
-- Affichage en pop-up/modal
-- Composition du plat affichée
-- Fermeture : clic sur 'x' ou à côté de la pop-up
-- Écran sous la pop-up inactif durant l'affichage
-
-### Mess
-- Formulaire avec champs (nom, email, message, date souhaitée)
-- Envoi d'email à restaurant@desangosse.com avec demandeur en copie
-- Sujet : "Demande de réservation pour un mess"
-- Message d'avertissement si message déjà envoyé
+- **Header** :
+  - Navigation de date avec flèches SVG (pas d'images, pas de fond blanc)
+  - Affichage du jour, numéro et mois en français
+- **Réservation existante** :
+  - Si réservation existe déjà : message "Réservation déjà effectuée pour ce jour"
+  - Affichage des détails de la réservation (formule, entrée, plat, accompagnement, salade)
+  - Les boutons de formule sont masqués
+  - Bouton "Annuler" pour retour au dashboard
+- **Sans réservation** :
+  - **Cartes de formules** : Affichées côte à côte même sur mobile
+    - "Formule restaurant"
+    - "Formule salade"
+    - "Mess"
+  - **Sélection automatique** : "Formule restaurant" sélectionnée par défaut à l'arrivée
+  - **Formule restaurant** :
+    - Sections : Entrées, Plats, Accompagnements
+    - Radio buttons pour sélection (1 de chaque)
+    - Icône info (`info-icon.png`) à côté de chaque item → Ouvre modal avec description
+    - Sélection visuelle : fond vert (pas de checkmark blanc)
+  - **Formule salade** :
+    - Liste des salades disponibles
+    - Radio buttons pour sélection (1 salade)
+    - Icône info pour descriptions
+    - Sélection visuelle : fond vert
+  - **Formule Mess** :
+    - Formulaire avec champs (nombre de convives, repas souhaités, commentaires)
+    - Envoi d'email à `restaurant@desangosse.com` avec demandeur en copie
+    - Sujet : "Demande de réservation pour un mess"
+    - Message d'avertissement si demande déjà envoyée pour ce jour
+    - Vérification via entité `MessRequest`
+- **Footer** :
+  - Bouton "Annuler" (icône cross) → Retour au dashboard
+  - Icônes de modes de livraison :
+    - `chef-hat.png` pour "Sur place"
+    - `shopping-bag.png` pour "À emporter"
+    - `Idelivery-truck.png` pour "Livraison"
+  - Clic sur une icône de livraison → Valide automatiquement la réservation si tous les éléments sont sélectionnés
+- **Modal description** :
+  - Affichage du nom et de la description de l'item
+  - Message "Aucune information pour cet élément" si pas de description
+  - Fermeture par 'x' ou clic extérieur
+  - Fond assombri derrière la modal
 
 ## Interface Chef - Écran Agenda
 
-- Affichage par défaut des journées à venir
-- Possibilité de voir les journées passées (en gris)
-- Clic sur une date → Accès à la page de création/modification
-- Résumé de la configuration affichée pour chaque date
+- **Structure** :
+  - Bandeaux de mois avec dégradé vert (pas bleu foncé)
+  - Cartes de jours organisées par mois
+  - Affichage des 60 prochains jours par défaut
+- **Affichage par date** :
+  - Date et jour de la semaine à gauche
+  - Contenu au centre : formules actives avec compteurs de réservations
+  - Icônes de modes de livraison à droite (chef-hat, shopping-bag, Idelivery-truck)
+  - Filigrane "RÉSERVÉ" en diagonal pour les jours avec réservations
+- **Formules affichées** :
+  - "Formule restaurant (X)" avec compteur de réservations
+  - "Formule salade (X)" avec compteur de réservations
+  - "Mess (X)" avec compteur de demandes Mess
+  - Les compteurs s'affichent même s'ils sont à 0
+- **États visuels** :
+  - Jour configuré : fond normal
+  - Jour fermé (commentaire) : affichage du commentaire
+  - Jour non configuré : "Non configuré"
+- **Interactions** :
+  - Clic sur une carte → Accès à la page de création/modification du menu
+  - Navigation fluide entre les dates
 
 ## Interface Chef - Proposition d'un jour
 
-- **Alerte** : Si réservations existent déjà, message d'alerte affiché
+- **Header** :
+  - Bandeau avec dégradé vert (pas bleu foncé)
+  - Navigation de date avec flèches SVG (pas d'images, pas de fond blanc)
+  - Affichage du jour, numéro et mois en français
+- **Alerte** : Si réservations existent déjà, message d'alerte affiché en haut
 - **Modes de livraison** :
-  - Modes actifs repris des paramètres par défaut
-  - Modes actifs affichés en vert
-  - Clic sur 'Fermeture' → Désactive tous les modes de livraison
+  - Tous les lieux de l'entité `Lieu` sont affichés dynamiquement
+  - Modes actifs affichés en vert (fond vert)
+  - Modes inactifs affichés avec fond transparent
+  - Icônes dynamiques selon le nom du lieu :
+    - "Restaurant" ou "Sur place" → `chef-hat.png`
+    - "À emporter" → `shopping-bag.png`
+    - "Livraison" ou "Bureau" → `Idelivery-truck.png`
+  - Clic sur un mode → Toggle actif/inactif
+  - Option "Fermeture" avec icône `cross-icon.png` :
+    - Clic sur "Fermeture" → Désactive tous les autres modes
+    - Icône info apparaît si commentaire existe
+    - Clic sur icône info → Ouvre modal pour ajouter/modifier commentaire
 - **Commentaire** :
-  - Clic sur icône 'info' → Permet d'ajouter un commentaire
-  - Commentaire remplace l'affichage du menu (ex: "Fermeture exceptionnelle")
-  - La journée est alors verrouillée (locked = true)
-- **Cartes (types de plats)** :
-  - Types de carte repris des paramètres d'administration
-  - Clic sur le type de carte → Active/désactive
-  - Clic sur la flèche → Paramétrage de la carte pour la journée
+  - Modal moderne pour ajouter un commentaire
+  - Le commentaire remplace l'affichage du menu (ex: "Fermeture exceptionnelle")
+  - La journée est automatiquement verrouillée (locked = true) si commentaire existe
+- **Cartes (Formules)** :
+  - Toutes les formules de l'entité `Formule` sont affichées dynamiquement
+  - Clic sur une formule → Active/désactive (vert si actif, transparent si inactif)
+  - Flèche blanche (`choix-icon.png`) à côté de "Formule salade" → Ouvre interface de sélection des salades
+  - Flèche blanche (`choix-icon.png`) à côté de "Formule menu complet" → Ouvre interface de sélection des entrées, plats, accompagnements
+  - Pas de flèche pour "Mess" (géré différemment)
 - **Navigation** :
-  - Validation : bouton vert
-  - Annulation : bouton orange
-  - Flèches autour de la date pour changer de date
+  - Footer avec boutons modernes (pas d'icônes) :
+    - Bouton "Annuler" (gris) → Retour à l'agenda
+    - Bouton "Valider" (vert avec dégradé) → Sauvegarde et retour à l'agenda
+  - Flèches autour de la date pour changer de date sans revenir en arrière
 
-## Interface Chef - Gestion des plats
+## Interface Chef - Sélection des éléments (Salades / Menu complet)
 
-- Plats sélectionnés : affichés en haut sur fond vert
-- Plats non sélectionnés : affichés en bleu
-- Sélection/désélection : clic sur le plat
-- Validation : bouton vert
-- Annulation : bouton orange
-- Flèches autour de la date pour changer de date
-- Icône appareil photo : aperçu de l'affichage pour le consommateur
+### Interface de sélection des salades (`select-salades`)
+- **Header** : Titre "Sélection des salades" avec date
+- **Barre de recherche** : Filtre les salades en temps réel
+- **Grille de salades** :
+  - Cartes de salades avec nom
+  - Salades sélectionnées : fond vert
+  - Salades non sélectionnées : fond bleu/transparent
+  - Clic sur une carte → Toggle sélection
+- **Bouton créer** : FAB (Floating Action Button) avec "+" pour créer une nouvelle salade
+- **Modal création** : Formulaire pour créer une nouvelle salade (nom, description)
+- **Footer** :
+  - Bouton "Annuler" (gris) → Retour à `menu-day`
+  - Bouton "Valider" (vert) → Sauvegarde les sélections et retour à `menu-day`
+
+### Interface de sélection menu complet (`select-menu-complet`)
+- **Structure similaire** mais organisée en sections :
+  - Section "Entrées" avec grille d'entrées
+  - Section "Plats" avec grille de plats
+  - Section "Accompagnements" avec grille d'accompagnements
+- **Boutons créer** : FAB pour chaque type (entrée, plat, accompagnement)
+- **Modals création** : Formulaires spécifiques pour chaque type
+- **Footer** : Identique à `select-salades`
 
 ---
 
@@ -564,16 +666,20 @@ Ajouter les nouvelles entries :
 ```javascript
 .addEntry('employee-dashboard', './assets/employee/js/dashboard.js')
 .addEntry('employee-reserve', './assets/employee/js/reserve.js')
+.addEntry('employee-reservations', './assets/employee/js/reservations.js')
 .addEntry('employee-modal', './assets/employee/js/modal.js')
 .addEntry('employee-mess', './assets/employee/js/mess.js')
 .addEntry('chef-agenda', './assets/chef/js/agenda.js')
 .addEntry('chef-menu-day', './assets/chef/js/menu-day.js')
+.addEntry('chef-select-items', './assets/chef/js/select-items.js')
 .addEntry('chef-manage-meals', './assets/chef/js/manage-meals.js')
 .addEntry('chef-entrees', './assets/chef/js/entrees.js')
 .addEntry('chef-plats', './assets/chef/js/plats.js')
 .addEntry('chef-accompagnements', './assets/chef/js/accompagnements.js')
 .addEntry('chef-salades', './assets/chef/js/salades.js')
 ```
+
+**Note** : `chef-select-items` est utilisé pour les interfaces `select-salades` et `select-menu-complet`
 
 ---
 
@@ -655,70 +761,86 @@ Ajouter les nouvelles entries :
 ## Gestion des réservations (Chef)
 - Le chef peut voir toutes les réservations
 - Le chef peut voir qui a réservé et pour quelle formule
+- **Comptage des réservations** :
+  - Compteur par formule (Restaurant, Salade) affiché dans l'agenda
+  - Compteur des demandes Mess affiché dans l'agenda
+  - Les compteurs s'affichent même s'ils sont à 0
+  - Comparaison par ID de formule (pas par référence d'objet) pour éviter les erreurs
 - Le chef peut annuler des réservations non conformes
 - Le chef peut marquer une réservation comme 'served'
 - Le chef peut voir les statistiques (nombre de réservations, repas populaires)
 
 ## Mess (Demande spéciale)
 - Un salarié peut demander un mess via un formulaire
-- Le formulaire envoie un email à restaurant@desangosse.com avec le demandeur en copie
+- Le formulaire envoie un email à `restaurant@desangosse.com` avec le demandeur en copie
 - Sujet du mail : "Demande de réservation pour un mess"
-- Un message d'avertissement s'affiche si le message a déjà été envoyé (limite à définir)
+- Un message d'avertissement s'affiche si le message a déjà été envoyé pour ce jour
+- Vérification via entité `MessRequest` pour éviter les doublons
+- Le chef peut voir les demandes Mess dans l'agenda avec compteur
 
 ---
 
 # DESIGN ET UX
 
 ## Palette de couleurs
-- Conserver la palette verte existante du squelette
-- Ajouter des couleurs pour les statuts :
+- **Palette principale** : Dégradé vert moderne pour tous les bandeaux et headers
+  - Gradient : `linear-gradient(135deg, rgba(16, 185, 129, 0.85) 0%, rgba(5, 150, 105, 0.9) 50%, rgba(52, 211, 153, 0.8) 100%)`
+  - Remplace les anciens fonds bleu foncé (#0066cc)
+- **Couleurs de statuts** :
   - `pending` : orange (#f59e0b)
   - `confirmed` : bleu (#3b82f6)
   - `served` : vert (#10b981)
   - `cancelled` : rouge (#ef4444)
-- Tuiles avec réservation : couleur différente (ex: vert clair)
-- Tuiles sans réservation : couleur par défaut
-- Dates passées : gris
-- Dates verrouillées : indicateur visuel (cadenas)
+- **États visuels** :
+  - Élément sélectionné : fond vert (pas de checkmark blanc)
+  - Élément non sélectionné : fond transparent
+  - Tuiles avec réservation : filigrane "RÉSERVÉ" en diagonal
+  - Dates passées : gris
+  - Dates verrouillées : indicateur visuel (cadenas)
 
 ## Composants UI
 
 ### Interface Salarié
-- **Tuiles de dates** : 
-  - Cliquables pour accéder à la réservation
-  - Affichage différent si réservation existante
-  - Icône de mode de livraison visible
-  - Cadenas pour dates non modifiables
-  - Support du swipe (mobile)
+- **Dashboard** :
+  - Bandeaux de mois avec dégradé vert
+  - Cartes de jours avec entrées, plats, accompagnements
+  - Labels et items sur la même ligne
+  - Filigrane "RÉSERVÉ" pour jours réservés
 - **Écran de réservation** :
-  - Liste des plats avec sélection visuelle
-  - Premier plat sélectionné par défaut
-  - Bouton pour basculer entre formule restaurant/salade
-  - Icônes de modes de livraison en bas (validation automatique au clic)
-  - Flèches de navigation de date
-  - Croix orange pour retour
-  - Icône 'i' pour détails (ouvre pop-up)
+  - Header avec navigation SVG
+  - Cartes de formules côte à côte
+  - Sélection automatique "Formule restaurant" par défaut
+  - Radio buttons avec sélection visuelle (fond vert, pas de checkmark)
+  - Icônes info pour descriptions (modal)
+  - Gestion des réservations existantes
+  - Footer avec icônes de livraison
+- **Mes réservations** :
+  - Tableau moderne responsive
+  - Affichage du solde
+  - Bouton recharger le solde
 - **Pop-up détails plat** :
-  - Modal centré avec composition du plat
+  - Modal centré avec description
+  - Message si pas de description
   - Fermeture par 'x' ou clic extérieur
   - Fond assombri derrière la pop-up
 
 ### Interface Chef
 - **Agenda** :
-  - Vue calendrier avec dates cliquables
-  - Résumé de configuration par date
-  - Dates passées en gris
+  - Bandeaux de mois avec dégradé vert
+  - Cartes de jours avec formules et compteurs
+  - Icônes de livraison dynamiques
+  - Filigrane "RÉSERVÉ" pour jours réservés
 - **Proposition d'un jour** :
-  - Modes de livraison : icônes vertes si actifs
-  - Bouton "Fermeture" pour désactiver tous les modes
-  - Formulaire commentaire avec icône info
-  - Cartes (types de plats) avec activation/désactivation
-  - Boutons validation (vert) et annulation (orange)
-- **Gestion des plats** :
-  - Plats sélectionnés : fond vert, en haut
-  - Plats non sélectionnés : fond bleu
-  - Sélection par clic
-  - Icône appareil photo pour aperçu
+  - Header avec dégradé vert et navigation SVG
+  - Modes de livraison : tous les lieux affichés, vert si actifs
+  - Formules : toutes les formules affichées, vert si actives
+  - Flèches blanches pour accéder aux interfaces de sélection
+  - Boutons modernes texte (Valider/Annuler) au lieu d'icônes
+- **Sélection des éléments** :
+  - Grille responsive avec cartes
+  - FAB pour créer de nouveaux éléments
+  - Modals modernes pour création
+  - Boutons modernes dans le footer
 
 ## Responsive et interactions
 - Tous les templates doivent être responsive
@@ -799,11 +921,13 @@ Ajouter les nouvelles entries :
 ```
 src/
 ├── Controller/
-│   ├── EmployeeController.php
-│   ├── ChefController.php
+│   ├── EmployeeController.php (dashboard, reserve, mess, reservations, credit)
+│   ├── ChefController.php (agenda, menuDay, selectSalades, selectMenuComplet, CRUD éléments)
 │   ├── HomeController.php (modifié pour rediriger selon le rôle)
 │   ├── SecurityController.php
 │   └── RegistrationController.php (modifié pour assigner ROLE_EMPLOYEE par défaut)
+├── Twig/
+│   └── AppExtension.php (filtres month_fr, day_fr, contains)
 ├── Entity/
 │   ├── User.php (modifié)
 │   ├── Wallet.php (nouveau)
@@ -823,7 +947,8 @@ src/
 │   ├── CompositionSalade.php (nouveau)
 │   ├── CompositionFormule.php (nouveau)
 │   ├── CompositionLieu.php (nouveau)
-│   └── Reservation.php (nouveau - Commande)
+│   ├── Reservation.php (nouveau - Commande)
+│   └── MessRequest.php (nouveau)
 └── Repository/
     ├── UserRepository.php
     ├── WalletRepository.php (nouveau)
@@ -854,11 +979,12 @@ templates/
 │   ├── reserve-salad.html.twig
 │   ├── meal-details.html.twig
 │   ├── mess.html.twig
-│   └── reservations.html.twig
+│   └── reservations.html.twig (tableau moderne avec solde et bouton recharger)
 ├── chef/
-│   ├── agenda.html.twig
-│   ├── menu-day.html.twig
-│   ├── manage-meals.html.twig
+│   ├── agenda.html.twig (bandeaux mois, cartes jours, compteurs)
+│   ├── menu-day.html.twig (navigation SVG, modes/formules dynamiques)
+│   ├── select-salades.html.twig (sélection salades avec création)
+│   ├── select-menu-complet.html.twig (sélection entrées/plats/accompagnements avec création)
 │   ├── entrees/
 │   │   ├── index.html.twig
 │   │   ├── new.html.twig
@@ -880,17 +1006,14 @@ templates/
 │   │   └── details.html.twig
 │   └── settings.html.twig
 └── shared/
-    ├── date_tile.html.twig
-    ├── meal_card.html.twig
-    ├── delivery_mode_icons.html.twig
-    └── modal_meal_details.html.twig
+    └── (templates partagés optionnels - non utilisés dans l'implémentation actuelle)
 
 assets/
 ├── employee/
 │   ├── js/
 │   │   ├── dashboard.js
-│   │   ├── reserve.js
-│   │   ├── modal.js
+│   │   ├── reserve.js (sélection auto formule restaurant, modals descriptions)
+│   │   ├── reservations.js
 │   │   └── mess.js
 │   └── styles/
 │       ├── dashboard.scss
@@ -995,18 +1118,56 @@ php bin/console doctrine:fixtures:load
 
 ---
 
+# NAVBAR - DESIGN ET STRUCTURE
+
+## Navbar Responsive
+
+### Version Desktop (≥992px)
+- **Structure** :
+  - "Bonjour [Nom]" à gauche (même taille de police que le titre)
+  - Titre "Chez Antho" au centre (gradient vert)
+  - Menu de navigation centré (Agenda, Réservations, Paramètres / Dashboard, Mes réservations)
+  - Bouton Logout à droite
+- **Alignement** : Tous les éléments centrés horizontalement et verticalement
+- **Style** : Titre avec gradient vert (même style pour chef et salariés)
+
+### Version Mobile (<992px)
+- **Structure** :
+  - Titre "Chez Antho" à gauche (une seule ligne)
+  - Menu burger à droite (tout à droite de la navbar)
+  - Espace entre titre et burger
+- **Menu déroulant** :
+  - S'ouvre par-dessus le reste de l'application
+  - Se déploie depuis le burger (en dessous)
+  - Design moderne avec overlay et blur
+  - Animation fluide
+- **Visibilité** : Menu burger et menu mobile complètement cachés sur desktop
+
+## Twig Extension pour dates françaises
+
+Créer `src/Twig/AppExtension.php` avec :
+- Filtre `month_fr` : Traduit les mois en français
+- Filtre `day_fr` : Traduit les jours en français
+- Filtre `contains` : Vérifie si une chaîne contient une sous-chaîne
+
 # NOTES IMPORTANTES
 
-1. **Conserver le design existant** : Utiliser la palette verte et les styles du squelette
+1. **Design moderne** : 
+   - Dégradé vert pour tous les bandeaux (pas bleu foncé)
+   - Boutons modernes texte au lieu d'icônes dans les footers
+   - Navigation avec flèches SVG (pas d'images avec fond blanc)
+   - Sélection visuelle par couleur uniquement (pas de checkmark blanc)
 2. **Structure modulaire** : Continuer à utiliser la structure modulaire des assets
 3. **Sécurité** : Toujours vérifier les rôles et les permissions
 4. **Validation** : Valider toutes les entrées utilisateur
 5. **UX** : Messages de confirmation et d'erreur clairs
 6. **Responsive** : Tous les écrans doivent être pris en compte
-7. **Interactions tactiles** : Support du swipe sur mobile
-8. **Navigation fluide** : Éviter les rechargements de page inutiles
-9. **Feedback visuel** : Indicateurs clairs pour les actions (sélection, validation, etc.)
-10. **Accessibilité** : Gérer le focus, les modales, les interactions clavier
+7. **Navigation fluide** : Éviter les rechargements de page inutiles
+8. **Feedback visuel** : Indicateurs clairs pour les actions (sélection, validation, etc.)
+9. **Accessibilité** : Gérer le focus, les modales, les interactions clavier
+10. **Comparaison d'entités** : Utiliser `getId()` pour comparer les entités Doctrine (pas `===`)
+11. **Normalisation des dates** : Normaliser les dates à `Y-m-d` pour les comparaisons en base de données
+12. **Chargement des collections** : Utiliser `em->refresh()` après flush pour recharger les collections Doctrine
 
 ---
 
