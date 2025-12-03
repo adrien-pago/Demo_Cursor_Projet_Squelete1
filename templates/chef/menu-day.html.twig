@@ -1,0 +1,164 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Menu du {{ date|date('d/m/Y') }}{% endblock %}
+
+{% block main_class %}{% endblock %}
+
+{% block stylesheets %}{{ encore_entry_link_tags('chef-menu-day') }}{% endblock %}
+
+{% block body %}
+
+<div class="chef-menu-day-wrapper">
+  {# Header avec date et navigation #}
+  <div class="menu-day-header">
+    <div class="date-navigation">
+      <a href="{{ path('chef_menu_day', {date: date|date_modify('-1 day')|date('Y-m-d')}) }}" class="nav-arrow">
+        <svg class="arrow-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M15 18L9 12L15 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+      <div class="date-display">
+        <span class="day-name">{{ date|date('l')|day_fr|capitalize }}</span>
+        <span class="day-number">{{ date|date('d') }}</span>
+        <span class="month-name">{{ date|date('F')|month_fr|capitalize }}</span>
+      </div>
+      <a href="{{ path('chef_menu_day', {date: date|date_modify('+1 day')|date('Y-m-d')}) }}" class="nav-arrow">
+        <svg class="arrow-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 18L15 12L9 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  {# Message d'alerte si réservations existent #}
+  {% if hasReservations %}
+    <div class="reservation-warning">
+      <em class="warning-text">Attention il existe des réservations pour cette date</em>
+    </div>
+  {% endif %}
+
+  <form method="post" id="menu-day-form">
+    {# Section Modes de livraison #}
+    <div class="section-block">
+      <div class="section-header">
+        <h2>Modes de livraison</h2>
+      </div>
+      <div class="section-content">
+        {% set hasActiveLieu = false %}
+        {% for lieu in lieus %}
+          {% set compLieu = carteDuJour.compositionLieus|filter(c => c.lieu.id == lieu.id)|first %}
+          {% set isActive = compLieu and compLieu.active %}
+          {% if isActive %}{% set hasActiveLieu = true %}{% endif %}
+          
+          {% set lieuType = lieu.name|lower %}
+          {% set isSurPlace = lieuType == 'restaurant' or lieuType == 'sur place' %}
+          {% set isEmporter = lieuType|contains('emporter') %}
+          {% set isLivraison = lieuType|contains('livraison') or lieuType|contains('bureau') or lieuType|contains('delivery') %}
+          
+          {# Afficher TOUS les lieux de l'entité #}
+          <div class="delivery-mode-item {% if isActive %}active{% endif %}" data-lieu-id="{{ lieu.id }}">
+            <div class="mode-icon">
+              {% if isSurPlace %}
+                <img src="{{ asset('icons/chef-hat.png') }}" alt="Sur place" class="mode-icon-img">
+              {% elseif isEmporter %}
+                <img src="{{ asset('icons/shopping-bag.png') }}" alt="À emporter" class="mode-icon-img">
+              {% elseif isLivraison %}
+                <img src="{{ asset('icons/Idelivery-truck.png') }}" alt="Livraison" class="mode-icon-img">
+              {% else %}
+                {# Icône par défaut pour les autres lieux #}
+                <img src="{{ asset('icons/chef-hat.png') }}" alt="{{ lieu.name }}" class="mode-icon-img">
+              {% endif %}
+            </div>
+            <span class="mode-text">{{ lieu.name }}</span>
+            <input type="checkbox" name="lieus[]" value="{{ lieu.id }}" 
+                   class="mode-checkbox" {% if isActive %}checked{% endif %}>
+          </div>
+        {% endfor %}
+        
+        {# Option Fermeture #}
+        <div class="delivery-mode-item closure-mode {% if carteDuJour.comment %}active{% endif %}" id="closure-mode">
+          <div class="mode-icon">
+            <img src="{{ asset('icons/cross-icon.png') }}" alt="Fermeture" class="mode-icon-img">
+          </div>
+          <span class="mode-text">Fermeture</span>
+          <div class="mode-action">
+            {% if carteDuJour.comment %}
+              <img src="{{ asset('icons/info-icon.png') }}" alt="Info" class="info-icon" id="info-comment-btn">
+            {% else %}
+              <img src="{{ asset('icons/info-icon.png') }}" alt="Info" class="info-icon" id="info-comment-btn" style="display: none;">
+            {% endif %}
+          </div>
+          <input type="hidden" name="closure_mode" id="closure-mode-input" value="0">
+        </div>
+      </div>
+    </div>
+
+    {# Modal pour commentaire de fermeture #}
+    <div class="modal-overlay" id="comment-modal" style="display: none;">
+      <div class="modal-content">
+        <button class="modal-close" id="close-comment-modal">&times;</button>
+        <h3>Ajouter un commentaire</h3>
+        <p class="modal-info">Le commentaire remplacera l'affichage du menu et verrouillera la date.</p>
+        <textarea id="comment-input" name="comment" class="form-control" rows="4" 
+                  placeholder="Ex: Fermeture exceptionnelle">{{ carteDuJour.comment }}</textarea>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="cancel-comment">Annuler</button>
+          <button type="button" class="btn btn-primary" id="save-comment">Enregistrer</button>
+        </div>
+      </div>
+    </div>
+
+    {# Section Cartes #}
+    <div class="section-block">
+      <div class="section-header">
+        <h2>Cartes</h2>
+      </div>
+      <div class="section-content">
+        {% for formule in formules %}
+          {% set compFormule = carteDuJour.compositionFormules|filter(c => c.formule.id == formule.id)|first %}
+          {% set isActive = compFormule is not null %}
+          {% set isMess = formule.name|lower == 'mess' %}
+          
+          <div class="carte-item {% if isActive %}active{% endif %}" data-formule-id="{{ formule.id }}">
+            <div class="carte-icon">
+              <img src="{{ asset('icons/formule-icon.png') }}" alt="Formule" class="carte-icon-img">
+            </div>
+            <span class="carte-text">{{ formule.name }}</span>
+            <div class="carte-actions">
+              {% if formule.name|lower == 'salade' %}
+                <a href="{{ path('chef_select_salades', {date: date|date('Y-m-d')}) }}" class="carte-arrow-link">
+                  <img src="{{ asset('icons/choix-icon.png') }}" alt="Paramétrer" class="choix-icon">
+                </a>
+              {% elseif formule.name|lower == 'menu complet' %}
+                <a href="{{ path('chef_select_menu_complet', {date: date|date('Y-m-d')}) }}" class="carte-arrow-link">
+                  <img src="{{ asset('icons/choix-icon.png') }}" alt="Paramétrer" class="choix-icon">
+                </a>
+              {% endif %}
+            </div>
+            <input type="checkbox" name="formules[]" value="{{ formule.id }}" 
+                   class="carte-checkbox" {% if isActive %}checked{% endif %}>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    {# Champs cachés pour prix et autres paramètres #}
+    <input type="hidden" name="price" value="{{ carteDuJour.price|default('4.50') }}">
+    <input type="hidden" name="locked" id="locked-input" value="{% if carteDuJour.locked %}1{% else %}0{% endif %}">
+    <input type="hidden" name="available" id="available-input" value="{% if carteDuJour.available %}1{% else %}0{% endif %}">
+  </form>
+
+  {# Footer avec boutons d'action #}
+  <div class="menu-day-footer">
+    <button type="button" class="footer-btn cancel-btn" id="cancel-btn" data-agenda-url="{{ path('chef_agenda') }}">
+      <span class="btn-text">Annuler</span>
+    </button>
+    <button type="submit" form="menu-day-form" class="footer-btn validate-btn" id="validate-btn">
+      <span class="btn-text">Valider</span>
+    </button>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}{{ encore_entry_script_tags('chef-menu-day') }}{% endblock %}

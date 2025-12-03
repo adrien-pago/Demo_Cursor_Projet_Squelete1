@@ -1,0 +1,87 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Sélection des salades{% endblock %}
+
+{% block main_class %}{% endblock %}
+
+{% block stylesheets %}{{ encore_entry_link_tags('chef-select-items') }}{% endblock %}
+
+{% block body %}
+
+<div class="select-items-wrapper">
+  <div class="select-items-header">
+    <h2>Sélection des salades</h2>
+    <p class="date-info">{{ date|date('d/m/Y') }}</p>
+  </div>
+
+  {# Barre de recherche #}
+  <div class="search-bar-container">
+    <input type="text" id="search-input" class="search-input" placeholder="Rechercher">
+  </div>
+
+  {# Grille de salades #}
+  <div class="items-grid" id="items-grid">
+    {% for salade in salades %}
+      {% set isSelected = salade.id in selectedSaladeIds %}
+      <div class="item-card {% if isSelected %}selected{% endif %}" data-item-id="{{ salade.id }}" data-item-name="{{ salade.name|lower }}">
+        <div class="item-name">{{ salade.name }}</div>
+        <div class="item-category">Salade</div>
+        <input type="checkbox" name="salades[]" value="{{ salade.id }}" 
+               class="item-checkbox" {% if isSelected %}checked{% endif %}>
+      </div>
+    {% endfor %}
+  </div>
+
+  {# Bouton créer #}
+  <button class="fab-button" id="create-item-btn" title="Créer une nouvelle salade">
+    <span class="fab-icon">+</span>
+  </button>
+
+  {# Footer avec boutons #}
+  <div class="select-items-footer">
+    <a href="{{ path('chef_menu_day', {date: date|date('Y-m-d')}) }}" class="footer-btn cancel-btn">
+      <span class="btn-text">Annuler</span>
+    </a>
+    <button type="button" class="footer-btn validate-btn" id="validate-btn">
+      <span class="btn-text">Valider</span>
+    </button>
+  </div>
+</div>
+
+{# Modal pour créer une nouvelle salade #}
+<div class="modal-overlay" id="create-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Créer une nouvelle salade</h3>
+      <button class="modal-close" id="close-modal">&times;</button>
+    </div>
+    <form id="create-form" action="{{ path('chef_select_salades', {date: date|date('Y-m-d')}) }}" method="POST">
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="new_salade_name">Nom de la salade *</label>
+          <input type="text" id="new_salade_name" name="new_salade_name" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label for="new_salade_description">Description</label>
+          <textarea id="new_salade_description" name="new_salade_description" class="form-control" rows="3"></textarea>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" id="cancel-create">Annuler</button>
+        <button type="submit" class="btn btn-primary">Créer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<form id="selection-form" method="POST" style="display: none;">
+  {% for salade in salades %}
+    <input type="checkbox" name="salades[]" value="{{ salade.id }}" 
+           {% if salade.id in selectedSaladeIds %}checked{% endif %}>
+  {% endfor %}
+</form>
+
+{% endblock %}
+
+{% block javascripts %}{{ encore_entry_script_tags('chef-select-items') }}{% endblock %}
+

@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Demander un mess{% endblock %}
+
+{% block stylesheets %}{{ encore_entry_link_tags('employee-mess') }}{% endblock %}
+
+{% block body %}
+
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-body">
+          <h1 class="card-title mb-4">Demander un mess</h1>
+
+          {% for label, messages in app.flashes %}
+            {% for message in messages %}
+              <div class="alert alert-{{ label }}" role="alert">{{ message }}</div>
+            {% endfor %}
+          {% endfor %}
+
+          <form method="post">
+            <div class="mb-3">
+              <label for="date_souhaitee" class="form-label">Date souhaitée</label>
+              <input type="date" id="date_souhaitee" name="date_souhaitee" class="form-control" 
+                     min="{{ 'today'|date('Y-m-d') }}" required>
+            </div>
+            <div class="mb-3">
+              <label for="message" class="form-label">Message</label>
+              <textarea id="message" name="message" class="form-control" rows="5" required 
+                        placeholder="Décrivez votre demande de mess..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-brand w-100">Envoyer la demande</button>
+          </form>
+
+          <div class="mt-3">
+            <a href="{{ path('employee_dashboard') }}" class="btn btn-outline-secondary w-100">Retour</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}{{ encore_entry_script_tags('employee-mess') }}{% endblock %}
+

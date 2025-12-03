@@ -1,0 +1,127 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Sélection du menu complet{% endblock %}
+
+{% block main_class %}{% endblock %}
+
+{% block stylesheets %}{{ encore_entry_link_tags('chef-select-items') }}{% endblock %}
+
+{% block body %}
+
+<div class="select-items-wrapper">
+  <div class="select-items-header">
+    <h2>Sélection du menu complet</h2>
+    <p class="date-info">{{ date|date('d/m/Y') }}</p>
+  </div>
+
+  {# Barre de recherche #}
+  <div class="search-bar-container">
+    <input type="text" id="search-input" class="search-input" placeholder="Rechercher">
+  </div>
+
+  {# Grille d'items (entrées, plats, accompagnements) #}
+  <div class="items-grid" id="items-grid">
+    {# Entrées #}
+    {% for entree in entrees %}
+      {% set isSelected = entree.id in selectedEntreeIds %}
+      <div class="item-card {% if isSelected %}selected{% endif %}" data-item-id="{{ entree.id }}" data-item-name="{{ entree.name|lower }}" data-item-type="entree">
+        <div class="item-name">{{ entree.name }}</div>
+        <div class="item-category">Entrée</div>
+        <input type="checkbox" name="entrees[]" value="{{ entree.id }}" 
+               class="item-checkbox" {% if isSelected %}checked{% endif %}>
+      </div>
+    {% endfor %}
+    
+    {# Plats #}
+    {% for plat in plats %}
+      {% set isSelected = plat.id in selectedPlatIds %}
+      <div class="item-card {% if isSelected %}selected{% endif %}" data-item-id="{{ plat.id }}" data-item-name="{{ plat.name|lower }}" data-item-type="plat">
+        <div class="item-name">{{ plat.name }}</div>
+        <div class="item-category">Plat</div>
+        <input type="checkbox" name="plats[]" value="{{ plat.id }}" 
+               class="item-checkbox" {% if isSelected %}checked{% endif %}>
+      </div>
+    {% endfor %}
+    
+    {# Accompagnements #}
+    {% for accompagnement in accompagnements %}
+      {% set isSelected = accompagnement.id in selectedAccompagnementIds %}
+      <div class="item-card {% if isSelected %}selected{% endif %}" data-item-id="{{ accompagnement.id }}" data-item-name="{{ accompagnement.name|lower }}" data-item-type="accompagnement">
+        <div class="item-name">{{ accompagnement.name }}</div>
+        <div class="item-category">Accompagnement</div>
+        <input type="checkbox" name="accompagnements[]" value="{{ accompagnement.id }}" 
+               class="item-checkbox" {% if isSelected %}checked{% endif %}>
+      </div>
+    {% endfor %}
+  </div>
+
+  {# Bouton créer #}
+  <button class="fab-button" id="create-item-btn" title="Créer un nouvel item">
+    <span class="fab-icon">+</span>
+  </button>
+
+  {# Footer avec boutons #}
+  <div class="select-items-footer">
+    <a href="{{ path('chef_menu_day', {date: date|date('Y-m-d')}) }}" class="footer-btn cancel-btn">
+      <span class="btn-text">Annuler</span>
+    </a>
+    <button type="button" class="footer-btn validate-btn" id="validate-btn">
+      <span class="btn-text">Valider</span>
+    </button>
+  </div>
+</div>
+
+{# Modal pour créer un nouvel item #}
+<div class="modal-overlay" id="create-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Créer un nouvel item</h3>
+      <button class="modal-close" id="close-modal">&times;</button>
+    </div>
+    <form id="create-form" action="{{ path('chef_select_menu_complet', {date: date|date('Y-m-d')}) }}" method="POST">
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="new_item_type">Type *</label>
+          <select id="new_item_type" name="new_item_type" class="form-control" required>
+            <option value="">Sélectionner un type</option>
+            <option value="entree">Entrée</option>
+            <option value="plat">Plat</option>
+            <option value="accompagnement">Accompagnement</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="new_item_name">Nom *</label>
+          <input type="text" id="new_item_name" name="new_item_name" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label for="new_item_description">Description</label>
+          <textarea id="new_item_description" name="new_item_description" class="form-control" rows="3"></textarea>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" id="cancel-create">Annuler</button>
+        <button type="submit" class="btn btn-primary">Créer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<form id="selection-form" action="{{ path('chef_select_menu_complet', {date: date|date('Y-m-d')}) }}" method="POST" style="display: none;">
+  {% for entree in entrees %}
+    <input type="checkbox" name="entrees[]" value="{{ entree.id }}" 
+           {% if entree.id in selectedEntreeIds %}checked{% endif %}>
+  {% endfor %}
+  {% for plat in plats %}
+    <input type="checkbox" name="plats[]" value="{{ plat.id }}" 
+           {% if plat.id in selectedPlatIds %}checked{% endif %}>
+  {% endfor %}
+  {% for accompagnement in accompagnements %}
+    <input type="checkbox" name="accompagnements[]" value="{{ accompagnement.id }}" 
+           {% if accompagnement.id in selectedAccompagnementIds %}checked{% endif %}>
+  {% endfor %}
+</form>
+
+{% endblock %}
+
+{% block javascripts %}{{ encore_entry_script_tags('chef-select-items') }}{% endblock %}
+

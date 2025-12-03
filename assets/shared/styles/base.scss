@@ -55,54 +55,359 @@ body {
   min-height: 100vh;
 }
 
-// Navbar moderne
+// Navbar moderne - Version propre et simple
 .navbar {
   background: var(--bg-primary) !important;
   box-shadow: var(--shadow-sm);
   padding: 1rem 0;
-  backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border-color);
+  position: relative;
+  z-index: 1000;
 
-  .navbar-brand {
-    font-size: 1.5rem;
-    font-weight: 700;
-    background: var(--brand-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    text-decoration: none;
-    transition: transform 0.2s ease;
-
-    &:hover {
-      transform: scale(1.05);
-    }
-
-    @media (max-width: 768px) {
-      font-size: 1.25rem;
-    }
-  }
-
-  .navbar-toggler {
-    border: 2px solid var(--border-color);
-    border-radius: var(--radius-md);
-    padding: 0.5rem 0.75rem;
-    transition: all 0.3s ease;
-
-    &:focus {
-      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
-    }
-
-    .navbar-toggler-icon {
-      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%2833, 37, 41, 0.75%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
-    }
-  }
-
-  .navbar-collapse {
+  .container {
+    position: relative;
+    
+    // Sur mobile, réduire le padding à droite pour que le burger soit vraiment à droite
     @media (max-width: 991px) {
-      margin-top: 1rem;
-      padding-top: 1rem;
-      border-top: 1px solid var(--border-color);
-      text-align: center;
+      padding-right: 0.5rem;
+    }
+    
+    // Aligner avec le contenu principal (max-width: 1200px comme l'agenda)
+    @media (min-width: 768px) {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+  }
+  
+  // Forcer la fermeture du menu mobile sur desktop
+  @media (min-width: 992px) {
+    .navbar-collapse {
+      display: none !important;
+      
+      &.show {
+        display: none !important;
+      }
+    }
+    
+    .navbar-toggler {
+      display: none !important;
+    }
+  }
+
+  // ===== DESKTOP =====
+  .navbar-desktop {
+    gap: 1.5rem;
+    display: none !important;
+    justify-content: center;
+    align-items: center;
+    
+    @media (min-width: 992px) {
+      display: flex !important;
+    }
+    
+    .navbar-welcome {
+      color: var(--text-primary);
+      font-size: 1.5rem;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      
+      strong {
+        font-weight: 600;
+        margin-left: 0.25rem;
+      }
+    }
+
+    .navbar-brand {
+      font-size: 1.5rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: transform 0.2s ease;
+      margin: 0 1rem;
+      display: flex;
+      align-items: center;
+      line-height: 1;
+      
+      // Style par défaut (gradient vert) - même style pour chef et salariés
+      background: var(--brand-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      
+      &:hover {
+        transform: scale(1.05);
+      }
+    }
+
+    .navbar-nav-desktop {
+      display: flex;
+      align-items: center;
+      
+      .btn-nav {
+        padding: 0.5rem 1.25rem;
+        border-radius: var(--radius-md);
+        font-weight: 500;
+        font-size: 0.9rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+        border: 2px solid var(--brand-primary);
+        color: var(--brand-primary);
+        background: transparent;
+        display: flex;
+        align-items: center;
+        line-height: 1;
+        
+        &:hover {
+          background: var(--brand-primary);
+          color: white;
+          transform: translateY(-2px);
+          box-shadow: var(--shadow-md);
+        }
+        
+        &.active {
+          background: var(--brand-primary);
+          color: white;
+        }
+        
+        &.btn-nav-logout {
+          border-color: var(--border-color);
+          color: var(--text-secondary);
+          
+          &:hover {
+            background: var(--bg-secondary);
+            border-color: var(--text-secondary);
+            color: var(--text-primary);
+          }
+        }
+        
+        &.btn-nav-primary {
+          background: var(--brand-gradient);
+          color: white;
+          border: none;
+          
+          &:hover {
+            box-shadow: var(--shadow-brand);
+          }
+        }
+      }
+    }
+  }
+
+  // ===== MOBILE =====
+  .navbar-mobile {
+    position: relative;
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    
+    @media (min-width: 992px) {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      height: 0 !important;
+      overflow: hidden !important;
+    }
+    
+    .navbar-brand-mobile {
+      position: static;
+      transform: none;
+      font-size: 1.25rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: transform 0.2s ease;
+      z-index: 1;
+      white-space: nowrap;
+      flex-shrink: 0;
+      
+      // Style par défaut (gradient vert)
+      background: var(--brand-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      
+      // Style pour "Le 200" (bleu)
+      &.brand-le200 {
+        color: #0066cc;
+        background: none;
+        -webkit-text-fill-color: #0066cc;
+      }
+      
+      &:hover {
+        transform: scale(1.05);
+      }
+    }
+
+    .navbar-toggler {
+      z-index: 1001;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 0.5rem;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-secondary);
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+      margin-left: auto;
+      margin-right: 0;
+      
+      // Caché sur desktop
+      @media (min-width: 992px) {
+        display: none !important;
+        visibility: hidden !important;
+      }
+
+      &:hover {
+        background: var(--border-color);
+        transform: scale(1.05);
+      }
+
+      &:focus {
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        outline: none;
+      }
+
+      .navbar-toggler-icon {
+        width: 24px;
+        height: 24px;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%2833, 37, 41, 0.75%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2.5' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+      }
+      
+      &[aria-expanded="true"] {
+        background: var(--brand-primary);
+        border-color: var(--brand-primary);
+        
+        .navbar-toggler-icon {
+          background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2.5' d='M6 6L24 24M24 6L6 24'/%3e%3c/svg%3e");
+        }
+      }
+    }
+  }
+
+  // Menu mobile déroulant
+  .navbar-collapse {
+    // Caché sur desktop
+    @media (min-width: 992px) {
+      display: none !important;
+    }
+    
+    @media (max-width: 991px) {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      margin: 0;
+      padding: 0;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, opacity 0.3s ease;
+      opacity: 0;
+      pointer-events: none;
+      
+      &.show {
+        max-height: 100vh;
+        opacity: 1;
+        pointer-events: all;
+      }
+    }
+  }
+  
+  .navbar-mobile-menu {
+    // Caché sur desktop
+    @media (min-width: 992px) {
+      display: none !important;
+    }
+    
+    @media (max-width: 991px) {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      padding: 1.5rem 1rem;
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      margin-top: 80px;
+      margin-right: 1rem;
+      margin-left: auto;
+      max-width: 300px;
+      width: 85%;
+      animation: slideInRight 0.3s ease;
+    }
+  }
+  
+  @keyframes slideInRight {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  
+  .navbar-mobile-item {
+    display: block;
+    padding: 0.875rem 1.25rem;
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 1rem;
+    color: var(--text-primary);
+    background: var(--bg-secondary);
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    text-align: left;
+    
+    &:hover {
+      background: var(--brand-primary);
+      color: white;
+      transform: translateX(4px);
+      border-color: var(--brand-primary);
+      box-shadow: var(--shadow-md);
+    }
+    
+    &.active {
+      background: var(--brand-primary);
+      color: white;
+      border-color: var(--brand-primary);
+    }
+    
+    &.navbar-mobile-item-logout {
+      background: var(--bg-primary);
+      border-color: var(--border-color);
+      color: var(--text-secondary);
+      
+      &:hover {
+        background: var(--bg-secondary);
+        border-color: var(--text-secondary);
+        color: var(--text-primary);
+      }
+    }
+    
+    &.navbar-mobile-item-primary {
+      background: var(--brand-gradient);
+      color: white;
+      border: none;
+      
+      &:hover {
+        transform: translateX(4px) translateY(-2px);
+        box-shadow: var(--shadow-md);
+      }
     }
   }
 
@@ -135,6 +440,12 @@ body {
         color: white;
         transform: translateY(-2px);
         box-shadow: var(--shadow-brand);
+      }
+      
+      &.active {
+        background: var(--brand-primary);
+        color: white;
+        border-color: var(--brand-primary);
       }
     }
 
@@ -305,7 +616,7 @@ a {
   transition: all 0.2s ease;
   font-weight: 500;
   position: relative;
-
+  
   &:hover {
     color: var(--brand-secondary);
     
@@ -318,6 +629,13 @@ a {
       height: 2px;
       background: var(--brand-gradient);
       border-radius: 2px;
+    }
+  }
+  
+  // Exception pour les liens de navigation (flèches) - pas de soulignement
+  &.nav-arrow {
+    &::after {
+      display: none !important;
     }
   }
 }

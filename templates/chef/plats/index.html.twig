@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des plats{% endblock %}
+
+{% block stylesheets %}{{ encore_entry_link_tags('chef-plats') }}{% endblock %}
+
+{% block body %}
+
+<div class="container">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Gestion des plats</h1>
+    <a href="{{ path('chef_plats_new') }}" class="btn btn-brand">+ Nouveau plat</a>
+  </div>
+
+  {% if plats|length == 0 %}
+    <div class="alert alert-info">Aucun plat créé.</div>
+  {% else %}
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nom</th>
+            <th>Description</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for plat in plats %}
+            <tr>
+              <td>{{ plat.id }}</td>
+              <td><strong>{{ plat.name }}</strong></td>
+              <td>{{ plat.description|default('-') }}</td>
+              <td>
+                <a href="{{ path('chef_plats_edit', {id: plat.id}) }}" class="btn btn-sm btn-primary">Modifier</a>
+                <form method="post" action="{{ path('chef_plats_delete', {id: plat.id}) }}" class="d-inline"
+                      onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce plat ?');">
+                  <button type="submit" class="btn btn-sm btn-danger">Supprimer</button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+
+  <div class="mt-3">
+    <a href="{{ path('chef_agenda') }}" class="btn btn-outline-secondary">Retour</a>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}{{ encore_entry_script_tags('chef-plats') }}{% endblock %}
+

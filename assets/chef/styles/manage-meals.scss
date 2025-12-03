@@ -1,0 +1,15 @@
+@import "../../shared/styles/base.scss";
+
+.list-group-item {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    transform: translateX(5px);
+  }
+  
+  &.list-group-item-success {
+    order: -1;
+  }
+}
+

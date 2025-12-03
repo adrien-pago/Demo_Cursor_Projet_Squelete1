@@ -1,0 +1,81 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes réservations{% endblock %}
+
+{% block stylesheets %}{{ encore_entry_link_tags('employee-reservations') }}{% endblock %}
+
+{% block body %}
+
+<div class="employee-reservations-wrapper">
+  <div class="reservations-container">
+    <h1 class="page-title">Mes réservations</h1>
+
+    {% if reservations|length == 0 %}
+      <div class="empty-state">
+        <p>Vous n'avez aucune réservation.</p>
+      </div>
+    {% else %}
+      {# Tableau des réservations #}
+      <div class="reservations-table-container">
+        <table class="reservations-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Formule</th>
+              <th>Lieu</th>
+              <th>Prix</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for reservation in reservations %}
+              <tr>
+                <td class="reservation-date">
+                  <span class="date-day">{{ reservation.date|date('d') }}</span>
+                  <span class="date-month">{{ reservation.date|date('F')|month_fr|capitalize }}</span>
+                  <span class="date-year">{{ reservation.date|date('Y') }}</span>
+                </td>
+                <td class="reservation-type">
+                  {% set formuleNameLower = reservation.formule.name|lower %}
+                  {% if formuleNameLower == 'menu complet' or formuleNameLower == 'restaurant' %}
+                    <span class="type-badge type-restaurant">Restaurant</span>
+                  {% elseif formuleNameLower == 'salade' %}
+                    <span class="type-badge type-salade">Salade</span>
+                  {% elseif formuleNameLower == 'mess' %}
+                    <span class="type-badge type-mess">Mess</span>
+                  {% else %}
+                    <span class="type-badge">{{ reservation.formule.name|capitalize }}</span>
+                  {% endif %}
+                </td>
+                <td class="reservation-lieu">
+                  <span class="lieu-name">{{ reservation.lieu.name }}</span>
+                </td>
+                <td class="reservation-price">
+                  <span class="price-value">{{ reservation.price|number_format(2, ',', ' ') }} €</span>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endif %}
+
+    {# Solde actuel #}
+    <div class="balance-section">
+      <div class="balance-card">
+        <div class="balance-label">Solde actuel</div>
+        <div class="balance-value">{{ balance|number_format(2, ',', ' ') }} €</div>
+      </div>
+    </div>
+
+    {# Bouton recharger le solde #}
+    <div class="recharge-section">
+      <a href="{{ path('employee_credit') }}" class="recharge-btn">
+        <span>Recharger le solde</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}{{ encore_entry_script_tags('employee-reservations') }}{% endblock %}

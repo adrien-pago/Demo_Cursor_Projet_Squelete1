@@ -1,0 +1,108 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de bord{% endblock %}
+
+{% block main_class %}{% endblock %}
+
+{% block stylesheets %}{{ encore_entry_link_tags('employee-dashboard') }}{% endblock %}
+
+{% block body %}
+
+<div class="employee-dashboard-wrapper">
+  {# Contenu principal #}
+  <div class="employee-dashboard-main">
+    {% set currentMonth = null %}
+    {% for i in 0..60 %}
+      {% set currentDate = today|date_modify('+' ~ i ~ ' days') %}
+      {% set dateKey = currentDate|date('Y-m-d') %}
+      {% set menuData = menusByDate[dateKey] ?? null %}
+      {% set monthKey = currentDate|date('Y-m') %}
+      {% set monthName = currentDate|date('F')|month_fr %}
+      
+      {# Nouvelle section de mois #}
+      {% if currentMonth != monthKey %}
+        {% if currentMonth is not null %}
+          </div> {# Fermer le conteneur de jours précédent #}
+        {% endif %}
+        
+        <div class="month-section">
+          <div class="month-header">
+            {{ monthName|capitalize }}
+          </div>
+          <div class="days-list">
+        {% set currentMonth = monthKey %}
+      {% endif %}
+
+      {# Carte du jour #}
+      <div class="day-item {% if menuData and menuData.menu.comment %}day-closed{% elseif menuData %}day-configured{% else %}day-empty{% endif %} {% if dateKey in reservedDates %}day-reserved{% endif %}" data-date="{{ dateKey }}">
+        {# Date et jour à gauche #}
+        <div class="day-date-box">
+          <span class="day-number">{{ currentDate|date('d') }}</span>
+          <span class="day-name">{{ currentDate|date('D')|day_fr }}.</span>
+        </div>
+        
+        {# Contenu au centre #}
+        <div class="day-content">
+          {% if menuData and menuData.menu.comment %}
+            {# Fermeture exceptionnelle #}
+            <div class="day-closure">
+              <span class="closure-text">{{ menuData.menu.comment }}</span>
+            </div>
+          {% elseif menuData %}
+            {# Menu configuré - Afficher entrées, plats et accompagnements #}
+            <div class="menu-items-content">
+              {% if menuData.entrees|length > 0 %}
+                <div class="menu-category">
+                  <span class="category-label">Entrées:</span>
+                  <span class="category-items">
+                    {% for entree in menuData.entrees %}
+                      {{ entree.name }}{% if not loop.last %}, {% endif %}
+                    {% endfor %}
+                  </span>
+                </div>
+              {% endif %}
+              
+              {% if menuData.plats|length > 0 %}
+                <div class="menu-category">
+                  <span class="category-label">Plats:</span>
+                  <span class="category-items">
+                    {% for plat in menuData.plats %}
+                      {{ plat.name }}{% if not loop.last %}, {% endif %}
+                    {% endfor %}
+                  </span>
+                </div>
+              {% endif %}
+              
+              {% if menuData.accompagnements|length > 0 %}
+                <div class="menu-category">
+                  <span class="category-label">Accompagnements:</span>
+                  <span class="category-items">
+                    {% for accompagnement in menuData.accompagnements %}
+                      {{ accompagnement.name }}{% if not loop.last %}, {% endif %}
+                    {% endfor %}
+                  </span>
+                </div>
+              {% endif %}
+            </div>
+          {% else %}
+            {# Pas de menu configuré #}
+            <div class="day-empty-content">
+              <span class="empty-indicator">Non configuré</span>
+            </div>
+          {% endif %}
+        </div>
+        
+        {# Lien vers la réservation (caché visuellement mais accessible) #}
+        {% if menuData and not menuData.menu.comment %}
+          <a href="{{ path('employee_reserve', {date: dateKey}) }}" class="day-reserve-link" aria-label="Réserver pour ce jour"></a>
+        {% endif %}
+      </div>
+    {% endfor %}
+    </div> {# Fermer le dernier conteneur de jours #}
+    </div> {# Fermer la dernière section de mois #}
+  </div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}{{ encore_entry_script_tags('employee-dashboard') }}{% endblock %}

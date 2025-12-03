@@ -1,0 +1,76 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails réservation #{{ reservation.id }}{% endblock %}
+
+{% block stylesheets %}{{ encore_entry_link_tags('chef-agenda') }}{% endblock %}
+
+{% block body %}
+
+<div class="container">
+  <h1 class="mb-4">Détails de la réservation #{{ reservation.id }}</h1>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <strong>Date :</strong> {{ reservation.date|date('d/m/Y') }}
+        </div>
+        <div class="col-md-6">
+          <strong>Utilisateur :</strong> {{ reservation.user.name }} ({{ reservation.user.email }})
+        </div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <strong>Formule :</strong> {{ reservation.formule.name }}
+        </div>
+        <div class="col-md-6">
+          <strong>Lieu :</strong> {{ reservation.lieu.name }}
+        </div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <strong>Statut :</strong> 
+          <span class="badge bg-{% if reservation.statutCommande.name == 'pending' %}warning{% elseif reservation.statutCommande.name == 'confirmed' %}info{% elseif reservation.statutCommande.name == 'served' %}success{% else %}danger{% endif %}">
+            {{ reservation.statutCommande.name }}
+          </span>
+        </div>
+        <div class="col-md-6">
+          <strong>Prix :</strong> {{ reservation.price|number_format(2, ',', ' ') }} €
+        </div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-12">
+          <strong>Détails du repas :</strong>
+          <ul class="mt-2">
+            {% if reservation.formule.name == 'salade' and reservation.salade %}
+              <li>Salade : {{ reservation.salade.name }}</li>
+            {% else %}
+              {% if reservation.entree %}<li>Entrée : {{ reservation.entree.name }}</li>{% endif %}
+              {% if reservation.plat %}<li>Plat : {{ reservation.plat.name }}</li>{% endif %}
+              {% if reservation.accompagnement %}<li>Accompagnement : {{ reservation.accompagnement.name }}</li>{% endif %}
+              {% if reservation.dessert %}<li>Dessert : {{ reservation.dessert.name }}</li>{% endif %}
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <strong>Date de création :</strong> {{ reservation.createdAt|date('d/m/Y H:i') }}
+        </div>
+      </div>
+    </div>
+    <div class="card-footer">
+      {% if reservation.statutCommande.name != 'served' %}
+        <form method="post" action="{{ path('chef_reservation_mark_served', {id: reservation.id}) }}" class="d-inline">
+          <button type="submit" class="btn btn-success">Marquer comme servie</button>
+        </form>
+      {% endif %}
+      <a href="{{ path('chef_reservations') }}" class="btn btn-outline-secondary">Retour</a>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}{{ encore_entry_script_tags('chef-agenda') }}{% endblock %}
+

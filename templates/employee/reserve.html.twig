@@ -1,0 +1,300 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Réservation - {{ date|date('d/m/Y') }}{% endblock %}
+
+{% block main_class %}{% endblock %}
+
+{% block stylesheets %}{{ encore_entry_link_tags('employee-reserve') }}{% endblock %}
+
+{% block body %}
+
+<div class="employee-reserve-wrapper">
+  {# Navigation de date #}
+  <div class="reserve-header">
+    <div class="date-navigation">
+      <a href="{{ path('employee_reserve', {date: date|date_modify('-1 day')|date('Y-m-d')}) }}" class="nav-arrow">
+        <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </a>
+      <div class="date-display">
+        <span class="day-name">{{ date|date('l')|day_fr|capitalize }}</span>
+        <span class="day-number">{{ date|date('d') }}</span>
+        <span class="month-name">{{ date|date('F')|month_fr|capitalize }}</span>
+      </div>
+      <a href="{{ path('employee_reserve', {date: date|date_modify('+1 day')|date('Y-m-d')}) }}" class="nav-arrow">
+        <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </a>
+    </div>
+  </div>
+
+  {# Message si réservation déjà effectuée #}
+  {% if hasReservation %}
+    <div class="reservation-warning">
+      <p>Réservation déjà effectuée pour ce jour</p>
+    </div>
+
+    {# Affichage des détails de la réservation #}
+    <div class="reservation-details">
+      {% set formuleName = reservation.formule.name|lower %}
+      {% if formuleName == 'menu complet' or formuleName == 'restaurant' %}
+        {# Affichage du menu complet #}
+        {% if reservation.entree %}
+          <div class="reservation-item">
+            <span class="reservation-label">Entrée:</span>
+            <span class="reservation-value">{{ reservation.entree.name }}</span>
+          </div>
+        {% endif %}
+        {% if reservation.plat %}
+          <div class="reservation-item">
+            <span class="reservation-label">Plat:</span>
+            <span class="reservation-value">{{ reservation.plat.name }}</span>
+          </div>
+        {% endif %}
+        {% if reservation.accompagnement %}
+          <div class="reservation-item">
+            <span class="reservation-label">Accompagnement:</span>
+            <span class="reservation-value">{{ reservation.accompagnement.name }}</span>
+          </div>
+        {% endif %}
+      {% elseif formuleName == 'salade' %}
+        {# Affichage de la salade #}
+        {% if reservation.salade %}
+          <div class="reservation-item">
+            <span class="reservation-label">Salade:</span>
+            <span class="reservation-value">{{ reservation.salade.name }}</span>
+          </div>
+        {% endif %}
+      {% endif %}
+    </div>
+  {% else %}
+    {# Cartes des formules disponibles #}
+    <div class="formules-section">
+    {% for formule in formulesActives %}
+      {% set formuleNameLower = formule.name|lower %}
+      <div class="formule-card" data-formule-id="{{ formule.id }}" data-formule-name="{{ formule.name }}">
+        {% if formuleNameLower == 'menu complet' or formuleNameLower == 'restaurant' %}
+          <div class="formule-card-header">
+            <span class="formule-title">Formule restaurant</span>
+          </div>
+        {% elseif formuleNameLower == 'salade' %}
+          <div class="formule-card-header">
+            <span class="formule-title">Formule salade</span>
+          </div>
+        {% elseif formuleNameLower == 'mess' %}
+          <div class="formule-card-header">
+            <span class="formule-title">Mess</span>
+          </div>
+        {% else %}
+          <div class="formule-card-header">
+            <span class="formule-title">{{ formule.name|capitalize }}</span>
+          </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+    </div>
+  {% endif %}
+
+  {# Section Menu Complet (Formule restaurant) - seulement si pas de réservation #}
+  {% if not hasReservation %}
+  <div id="menu-complet-section" class="menu-section" style="display: none;">
+    {# Entrées #}
+    {% if entrees|length > 0 %}
+      <div class="meal-category">
+        <div class="category-header">
+          <span class="category-title">Entrées</span>
+        </div>
+        <div class="meal-items">
+          {% for entree in entrees %}
+            <div class="meal-item" data-type="entree" data-id="{{ entree.id }}">
+              <input type="radio" name="entree" id="entree-{{ entree.id }}" value="{{ entree.id }}" class="meal-radio">
+              <label for="entree-{{ entree.id }}" class="meal-label">
+                <span class="meal-name">{{ entree.name }}</span>
+              </label>
+              <button type="button" class="info-icon-btn" data-description="{{ entree.description|default('') }}" data-name="{{ entree.name }}" onclick="showItemInfo(this, event)">
+                <img src="{{ asset('icons/info-icon.png') }}" alt="Info" class="info-icon">
+              </button>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    {# Plats #}
+    {% if plats|length > 0 %}
+      <div class="meal-category">
+        <div class="category-header">
+          <span class="category-title">Plats</span>
+        </div>
+        <div class="meal-items">
+          {% for plat in plats %}
+            <div class="meal-item" data-type="plat" data-id="{{ plat.id }}">
+              <input type="radio" name="plat" id="plat-{{ plat.id }}" value="{{ plat.id }}" class="meal-radio">
+              <label for="plat-{{ plat.id }}" class="meal-label">
+                <span class="meal-name">{{ plat.name }}</span>
+              </label>
+              <button type="button" class="info-icon-btn" data-description="{{ plat.description|default('') }}" data-name="{{ plat.name }}" onclick="showItemInfo(this, event)">
+                <img src="{{ asset('icons/info-icon.png') }}" alt="Info" class="info-icon">
+              </button>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    {# Accompagnements #}
+    {% if accompagnements|length > 0 %}
+      <div class="meal-category">
+        <div class="category-header">
+          <span class="category-title">Accompagnements</span>
+        </div>
+        <div class="meal-items">
+          {% for accompagnement in accompagnements %}
+            <div class="meal-item" data-type="accompagnement" data-id="{{ accompagnement.id }}">
+              <input type="radio" name="accompagnement" id="accompagnement-{{ accompagnement.id }}" value="{{ accompagnement.id }}" class="meal-radio">
+              <label for="accompagnement-{{ accompagnement.id }}" class="meal-label">
+                <span class="meal-name">{{ accompagnement.name }}</span>
+              </label>
+              <button type="button" class="info-icon-btn" data-description="{{ accompagnement.description|default('') }}" data-name="{{ accompagnement.name }}" onclick="showItemInfo(this, event)">
+                <img src="{{ asset('icons/info-icon.png') }}" alt="Info" class="info-icon">
+              </button>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  {# Section Salade #}
+  <div id="salade-section" class="menu-section" style="display: none;">
+    {% if salades|length > 0 %}
+      <div class="meal-category">
+        <div class="category-header">
+          <span class="category-title">Salades</span>
+        </div>
+        <div class="meal-items">
+          {% for salade in salades %}
+            <div class="meal-item" data-type="salade" data-id="{{ salade.id }}">
+              <input type="radio" name="salade" id="salade-{{ salade.id }}" value="{{ salade.id }}" class="meal-radio">
+              <label for="salade-{{ salade.id }}" class="meal-label">
+                <span class="meal-name">{{ salade.name }}</span>
+              </label>
+              <button type="button" class="info-icon-btn" data-description="{{ salade.description|default('') }}" data-name="{{ salade.name }}" onclick="showItemInfo(this, event)">
+                <img src="{{ asset('icons/info-icon.png') }}" alt="Info" class="info-icon">
+              </button>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  {# Section Mess #}
+  <div id="mess-section" class="menu-section" style="display: none;">
+    {% if hasMessRequest %}
+      {# Message d'avertissement si déjà envoyé #}
+      <div class="mess-warning">
+        <p>Message envoyé le {{ messRequest.sentAt|date('d') }} {{ messRequest.sentAt|date('F')|month_fr }} {{ messRequest.sentAt|date('Y') }}</p>
+      </div>
+    {% else %}
+      {# Formulaire Mess #}
+      <form method="post" action="{{ path('employee_reserve', {date: date|date('Y-m-d')}) }}" class="mess-form" id="mess-form">
+        <input type="hidden" name="mess_form" value="1">
+        
+        {# Nombre de convives #}
+        <div class="form-group">
+          <label for="nombre_convives" class="form-label">Nombre de convives</label>
+          <input type="number" id="nombre_convives" name="nombre_convives" class="form-control" min="1" placeholder="123">
+        </div>
+
+        {# Repas #}
+        <div class="form-group">
+          <label class="form-label">Repas</label>
+          <div class="repas-checkboxes">
+            <div class="repas-item">
+              <input type="checkbox" id="petit_dejeuner" name="petit_dejeuner" class="repas-checkbox">
+              <label for="petit_dejeuner" class="repas-label">Petit déjeuner</label>
+            </div>
+            <div class="repas-item">
+              <input type="checkbox" id="dejeuner" name="dejeuner" class="repas-checkbox">
+              <label for="dejeuner" class="repas-label">Déjeuner</label>
+            </div>
+            <div class="repas-item">
+              <input type="checkbox" id="pauses" name="pauses" class="repas-checkbox">
+              <label for="pauses" class="repas-label">Pauses</label>
+            </div>
+            <div class="repas-item">
+              <input type="checkbox" id="diner" name="diner" class="repas-checkbox" checked>
+              <label for="diner" class="repas-label">Diner</label>
+            </div>
+          </div>
+        </div>
+
+        {# Commentaires #}
+        <div class="form-group">
+          <label for="commentaires" class="form-label">Commentaires</label>
+          <textarea id="commentaires" name="commentaires" class="form-control" rows="4" placeholder="Accueil client AgroSud"></textarea>
+        </div>
+
+      </form>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {# Footer avec bouton annuler et lieux (ou boutons Mess) #}
+  <div class="reserve-footer" id="reserve-footer">
+    {% if not hasReservation %}
+      {# Afficher les boutons normaux si on n'est pas dans la section Mess #}
+      <a href="{{ path('employee_dashboard') }}" class="footer-btn cancel-btn" id="footer-cancel-btn">
+        <img src="{{ asset('icons/cross-icon.png') }}" alt="Annuler" class="footer-icon">
+      </a>
+      
+      <div class="lieux-icons" id="lieux-icons">
+      {% for lieu in lieusActifs %}
+        {% set lieuNameLower = lieu.name|lower %}
+        <div class="lieu-icon-wrapper" data-lieu-id="{{ lieu.id }}">
+          {% if lieuNameLower == 'restaurant' or lieuNameLower == 'sur place' %}
+            <img src="{{ asset('icons/chef-hat.png') }}" alt="Sur place" class="lieu-icon" title="Sur place">
+          {% elseif lieuNameLower|contains('emporter') or lieuNameLower|contains('à emporter') %}
+            <img src="{{ asset('icons/shopping-bag.png') }}" alt="À emporter" class="lieu-icon" title="À emporter">
+          {% elseif lieuNameLower|contains('livraison') or lieuNameLower|contains('bureau') or lieuNameLower|contains('delivery') %}
+            <img src="{{ asset('icons/Idelivery-truck.png') }}" alt="Livraison" class="lieu-icon" title="Livraison">
+          {% endif %}
+        </div>
+      {% endfor %}
+      </div>
+      <button type="submit" class="btn btn-primary validate-btn" form="reservation-form" id="footer-validate-btn">Valider</button>
+    {% endif %}
+    
+    {# Boutons pour la section Mess (cachés par défaut) #}
+    <div class="mess-footer-buttons" id="mess-footer-buttons" style="display: none;">
+      <a href="{{ path('employee_dashboard') }}" class="footer-btn cancel-btn">
+        <img src="{{ asset('icons/cross-icon.png') }}" alt="Annuler" class="footer-icon">
+      </a>
+      <button type="submit" form="mess-form" class="mess-submit-btn-footer">Envoyer le message</button>
+    </div>
+  </div>
+
+  {# Formulaire caché pour la soumission #}
+  <form method="post" action="{{ path('employee_reserve_post') }}" id="reservation-form" style="display: none;">
+    <input type="hidden" name="date" value="{{ date|date('Y-m-d') }}">
+    <input type="hidden" name="formule" id="form-formule" value="">
+    <input type="hidden" name="lieu" id="form-lieu" value="">
+    <input type="hidden" name="entree" id="form-entree" value="">
+    <input type="hidden" name="plat" id="form-plat" value="">
+    <input type="hidden" name="accompagnement" id="form-accompagnement" value="">
+    <input type="hidden" name="salade" id="form-salade" value="">
+  </form>
+</div>
+
+{# Modal pour afficher la description de l'item #}
+<div id="item-info-modal" class="item-info-modal">
+  <div class="item-info-overlay" onclick="closeItemInfo()"></div>
+  <div class="item-info-content">
+    <button type="button" class="item-info-close" onclick="closeItemInfo()">&times;</button>
+    <h3 class="item-info-title" id="item-info-title"></h3>
+    <p class="item-info-description" id="item-info-description"></p>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}{{ encore_entry_script_tags('employee-reserve') }}{% endblock %}

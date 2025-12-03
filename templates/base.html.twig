@@ -10,24 +10,66 @@
 <body class="d-flex flex-column min-vh-100">
 <nav class="navbar navbar-expand-lg navbar-light">
   <div class="container">
-    <a class="navbar-brand fw-bold" href="{{ path('app_home') }}">Starter</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <div class="ms-auto ms-lg-auto d-flex align-items-center flex-wrap gap-2 justify-content-center justify-content-lg-end">
+    {# Desktop : Bonjour | Titre | Boutons #}
+    <div class="navbar-desktop d-none d-lg-flex align-items-center w-100">
+      {% if app.user %}
+        <span class="navbar-welcome">Bonjour <strong>{{ app.user.name ?? app.user.userIdentifier }}</strong></span>
+      {% endif %}
+      
+      <a class="navbar-brand" href="{{ path('app_home') }}">
+        Chez Antho
+      </a>
+      
+      <div class="navbar-nav-desktop d-flex align-items-center gap-2 ms-auto">
         {% if app.user %}
-          <span class="me-3 text-muted d-none d-md-inline">Bonjour <strong>{{ app.user.userIdentifier }}</strong></span>
-          <a class="btn btn-outline-secondary btn-sm" href="{{ path('app_logout') }}">Logout</a>
+          {% if 'ROLE_CHEF' in app.user.roles %}
+            <a class="btn-nav {% if app.request.attributes.get('_route') == 'chef_agenda' %}active{% endif %}" href="{{ path('chef_agenda') }}">Agenda</a>
+            <a class="btn-nav {% if app.request.attributes.get('_route') == 'chef_reservations' %}active{% endif %}" href="{{ path('chef_reservations') }}">Réservations</a>
+            <a class="btn-nav {% if app.request.attributes.get('_route') == 'chef_settings' %}active{% endif %}" href="{{ path('chef_settings') }}">Paramètres</a>
+          {% else %}
+            <a class="btn-nav" href="{{ path('employee_dashboard') }}">Dashboard</a>
+            <a class="btn-nav" href="{{ path('employee_reservations') }}">Mes réservations</a>
+          {% endif %}
+          <a class="btn-nav btn-nav-logout" href="{{ path('app_logout') }}">Logout</a>
         {% else %}
-          <a class="btn btn-primary btn-sm" href="{{ path('app_login') }}">Login</a>
-          <a class="btn btn-outline-primary btn-sm" href="{{ path('app_register') }}">Register</a>
+          <a class="btn-nav btn-nav-primary" href="{{ path('app_login') }}">Login</a>
+          <a class="btn-nav" href="{{ path('app_register') }}">Register</a>
+        {% endif %}
+      </div>
+    </div>
+    
+    {# Mobile : Titre à gauche + Burger à droite #}
+    <div class="navbar-mobile d-flex d-lg-none align-items-center justify-content-between w-100">
+      <a class="navbar-brand-mobile" href="{{ path('app_home') }}">
+        Chez Antho
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMobileMenu" aria-controls="navbarMobileMenu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    </div>
+    
+    {# Menu mobile déroulant #}
+    <div class="collapse navbar-collapse d-lg-none" id="navbarMobileMenu">
+      <div class="navbar-mobile-menu">
+        {% if app.user %}
+          {% if 'ROLE_CHEF' in app.user.roles %}
+            <a class="navbar-mobile-item {% if app.request.attributes.get('_route') == 'chef_agenda' %}active{% endif %}" href="{{ path('chef_agenda') }}">Agenda</a>
+            <a class="navbar-mobile-item {% if app.request.attributes.get('_route') == 'chef_reservations' %}active{% endif %}" href="{{ path('chef_reservations') }}">Réservations</a>
+            <a class="navbar-mobile-item {% if app.request.attributes.get('_route') == 'chef_settings' %}active{% endif %}" href="{{ path('chef_settings') }}">Paramètres</a>
+          {% else %}
+            <a class="navbar-mobile-item" href="{{ path('employee_dashboard') }}">Dashboard</a>
+            <a class="navbar-mobile-item" href="{{ path('employee_reservations') }}">Mes réservations</a>
+          {% endif %}
+          <a class="navbar-mobile-item navbar-mobile-item-logout" href="{{ path('app_logout') }}">Logout</a>
+        {% else %}
+          <a class="navbar-mobile-item navbar-mobile-item-primary" href="{{ path('app_login') }}">Login</a>
+          <a class="navbar-mobile-item" href="{{ path('app_register') }}">Register</a>
         {% endif %}
       </div>
     </div>
   </div>
 </nav>
-<main class="container flex-grow-1 min-h-70vh py-5">
+<main class="flex-grow-1 {% block main_class %}container min-h-70vh py-5{% endblock %}">
   {% block body %}{% endblock %}
 </main>
 <footer class="border-top mt-auto">
@@ -38,4 +80,3 @@
 {% block javascripts %}{% endblock %}
 </body>
 </html>
-

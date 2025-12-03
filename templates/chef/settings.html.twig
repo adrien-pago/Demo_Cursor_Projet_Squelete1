@@ -1,0 +1,89 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Paramètres{% endblock %}
+
+{% block stylesheets %}{{ encore_entry_link_tags('chef-agenda') }}{% endblock %}
+
+{% block body %}
+
+<div class="container">
+  <h1 class="mb-4">Paramètres d'administration</h1>
+
+  <form method="post">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5>Modes de livraison (Lieux)</h5>
+          </div>
+          <div class="card-body">
+            <div id="lieus-container">
+              {% for lieu in lieus %}
+                <div class="mb-2 d-flex gap-2">
+                  <input type="hidden" name="lieu_ids[]" value="{{ lieu.id }}">
+                  <input type="text" name="lieu_names[]" value="{{ lieu.name }}" class="form-control" required>
+                </div>
+              {% endfor %}
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-primary mt-2" id="add-lieu">+ Ajouter un lieu</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5>Formules</h5>
+          </div>
+          <div class="card-body">
+            <div id="formules-container">
+              {% for formule in formules %}
+                <div class="mb-2 d-flex gap-2">
+                  <input type="hidden" name="formule_ids[]" value="{{ formule.id }}">
+                  <input type="text" name="formule_names[]" value="{{ formule.name }}" class="form-control" required>
+                </div>
+              {% endfor %}
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-primary mt-2" id="add-formule">+ Ajouter une formule</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12">
+        <button type="submit" class="btn btn-success">Enregistrer</button>
+        <a href="{{ path('chef_agenda') }}" class="btn btn-outline-secondary">Retour</a>
+      </div>
+    </div>
+  </form>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.getElementById('add-lieu')?.addEventListener('click', function() {
+  const container = document.getElementById('lieus-container');
+  const div = document.createElement('div');
+  div.className = 'mb-2 d-flex gap-2';
+  div.innerHTML = `
+    <input type="hidden" name="lieu_ids[]" value="">
+    <input type="text" name="lieu_names[]" class="form-control" required>
+  `;
+  container.appendChild(div);
+});
+
+document.getElementById('add-formule')?.addEventListener('click', function() {
+  const container = document.getElementById('formules-container');
+  const div = document.createElement('div');
+  div.className = 'mb-2 d-flex gap-2';
+  div.innerHTML = `
+    <input type="hidden" name="formule_ids[]" value="">
+    <input type="text" name="formule_names[]" class="form-control" required>
+  `;
+  container.appendChild(div);
+});
+</script>
+{% endblock %}
+

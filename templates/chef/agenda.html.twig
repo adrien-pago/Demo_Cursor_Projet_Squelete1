@@ -1,0 +1,126 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Agenda{% endblock %}
+
+{% block main_class %}{% endblock %}
+
+{% block stylesheets %}{{ encore_entry_link_tags('chef-agenda') }}{% endblock %}
+
+{% block body %}
+
+<div class="chef-agenda-wrapper">
+  {# Contenu principal #}
+  <div class="chef-agenda-main">
+    {% set currentMonth = null %}
+    {% for i in 0..60 %}
+      {% set currentDate = today|date_modify('+' ~ i ~ ' days') %}
+      {% set dateKey = currentDate|date('Y-m-d') %}
+      {% set menuData = menusByDate[dateKey] ?? null %}
+      {% set monthKey = currentDate|date('Y-m') %}
+      {% set monthName = currentDate|date('F')|month_fr %}
+      
+      {# Nouvelle section de mois #}
+      {% if currentMonth != monthKey %}
+        {% if currentMonth is not null %}
+          </div> {# Fermer le conteneur de jours précédent #}
+        {% endif %}
+        
+        <div class="month-section">
+          <div class="month-header">
+            {{ monthName|capitalize }}
+          </div>
+          <div class="days-list">
+        {% set currentMonth = monthKey %}
+      {% endif %}
+
+      {# Carte du jour #}
+      <div class="day-item {% if menuData and menuData.menu.comment %}day-closed{% elseif menuData %}day-configured{% else %}day-empty{% endif %}" data-date="{{ dateKey }}">
+        {# Date et jour à gauche #}
+        <div class="day-date-box">
+          <span class="day-number">{{ currentDate|date('d') }}</span>
+          <span class="day-name">{{ currentDate|date('D')|day_fr }}.</span>
+        </div>
+        
+        {# Contenu au centre #}
+        <div class="day-content">
+          {% if menuData and menuData.menu.comment %}
+            {# Fermeture exceptionnelle #}
+            <div class="day-closure">
+              <span class="closure-text">{{ menuData.menu.comment }}</span>
+            </div>
+          {% elseif menuData %}
+            {# Menu configuré #}
+            <div class="formules-content">
+              {% if menuData.menu.compositionFormules|filter(f => f.formule.name == 'menu complet')|length > 0 %}
+                <div class="formule-line">
+                  <span class="formule-text">Formule restaurant</span>
+                  <span class="formule-count">({{ menuData.countRestaurant }})</span>
+                </div>
+              {% endif %}
+              
+              {% if menuData.menu.compositionFormules|filter(f => f.formule.name == 'salade')|length > 0 %}
+                <div class="formule-line">
+                  <span class="formule-text">Formule salade</span>
+                  <span class="formule-count">({{ menuData.countSalade }})</span>
+                </div>
+              {% endif %}
+              
+              {% if menuData.hasMess %}
+                <div class="formule-line">
+                  <span class="formule-text mess-text">Mess</span>
+                  <span class="formule-count">({{ menuData.countMess }})</span>
+                </div>
+              {% endif %}
+            </div>
+          {% else %}
+            {# Pas de menu configuré #}
+            <div class="day-empty-content">
+              <span class="empty-indicator">Non configuré</span>
+            </div>
+          {% endif %}
+        </div>
+        
+        {# Icônes à droite #}
+        <div class="day-icons">
+          {% if menuData and menuData.menu.comment %}
+            {# Icône cadenas pour fermeture #}
+            <img src="{{ asset('icons/close-icon.png') }}" alt="Fermé" class="icon-lock">
+          {% elseif menuData %}
+            {# Icônes de livraison #}
+            {% set hasSurPlace = false %}
+            {% set hasEmporter = false %}
+            {% set hasLivraison = false %}
+            {% for lieu in menuData.activeLieus %}
+              {% set lieuNameLower = lieu.name|lower %}
+              {% if (lieuNameLower == 'restaurant' or lieuNameLower == 'sur place') and not hasSurPlace %}
+                {% set hasSurPlace = true %}
+              {% elseif (lieuNameLower|contains('emporter') or lieuNameLower|contains('à emporter')) and not hasEmporter %}
+                {% set hasEmporter = true %}
+              {% elseif (lieuNameLower|contains('livraison') or lieuNameLower|contains('bureau') or lieuNameLower|contains('delivery')) and not hasLivraison %}
+                {% set hasLivraison = true %}
+              {% endif %}
+            {% endfor %}
+            {% if hasSurPlace %}
+              <img src="{{ asset('icons/chef-hat.png') }}" alt="Sur place" class="delivery-icon" title="Sur place">
+            {% endif %}
+            {% if hasEmporter %}
+              <img src="{{ asset('icons/shopping-bag.png') }}" alt="À emporter" class="delivery-icon" title="À emporter">
+            {% endif %}
+            {% if hasLivraison %}
+              <img src="{{ asset('icons/Idelivery-truck.png') }}" alt="Livraison" class="delivery-icon" title="Livraison">
+            {% endif %}
+          {% endif %}
+        </div>
+        
+        {# Lien de modification (caché visuellement mais accessible) #}
+        <a href="{{ path('chef_menu_day', {date: dateKey}) }}" class="day-edit-link" aria-label="{% if menuData %}Modifier{% else %}Créer{% endif %} le menu"></a>
+      </div>
+    {% endfor %}
+    </div> {# Fermer le dernier conteneur de jours #}
+    </div> {# Fermer la dernière section de mois #}
+  </div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}{{ encore_entry_script_tags('chef-agenda') }}{% endblock %}

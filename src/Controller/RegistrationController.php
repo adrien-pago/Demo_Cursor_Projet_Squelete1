@@ -24,18 +24,25 @@ final class RegistrationController extends AbstractController
         }
 
         $email = (string) $request->request->get('email', '');
+        $name = (string) $request->request->get('name', '');
         $plain = (string) $request->request->get('password', '');
 
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL) || mb_strlen($plain) < 8) {
-            $this->addFlash('danger', 'Email invalide ou mot de passe trop court (min 8).');
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL) || mb_strlen($plain) < 8 || empty($name)) {
+            $this->addFlash('danger', 'Email invalide, nom manquant ou mot de passe trop court (min 8).');
             return $this->render('security/register.html.twig', [
                 'prefill_email' => $email,
+                'prefill_name' => $name,
             ], new Response('', 400));
         }
 
-        $user = (new User())->setEmail($email);
+        $user = (new User())
+            ->setEmail($email)
+            ->setName($name)
+            ->setRoles(['ROLE_EMPLOYEE'])
+            ->setCompteVerif(true);
         $user->setPassword($hasher->hashPassword($user, $plain));
-        $em->persist($user); $em->flush();
+        $em->persist($user); 
+        $em->flush();
 
         return $this->redirectToRoute('app_login');
     }

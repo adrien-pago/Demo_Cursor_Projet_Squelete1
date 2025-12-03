@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des entrées{% endblock %}
+
+{% block stylesheets %}{{ encore_entry_link_tags('chef-entrees') }}{% endblock %}
+
+{% block body %}
+
+<div class="container">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Gestion des entrées</h1>
+    <a href="{{ path('chef_entrees_new') }}" class="btn btn-brand">+ Nouvelle entrée</a>
+  </div>
+
+  {% if entrees|length == 0 %}
+    <div class="alert alert-info">Aucune entrée créée.</div>
+  {% else %}
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nom</th>
+            <th>Description</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for entree in entrees %}
+            <tr>
+              <td>{{ entree.id }}</td>
+              <td><strong>{{ entree.name }}</strong></td>
+              <td>{{ entree.description|default('-') }}</td>
+              <td>
+                <a href="{{ path('chef_entrees_edit', {id: entree.id}) }}" class="btn btn-sm btn-primary">Modifier</a>
+                <form method="post" action="{{ path('chef_entrees_delete', {id: entree.id}) }}" class="d-inline"
+                      onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette entrée ?');">
+                  <button type="submit" class="btn btn-sm btn-danger">Supprimer</button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+
+  <div class="mt-3">
+    <a href="{{ path('chef_agenda') }}" class="btn btn-outline-secondary">Retour</a>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}{{ encore_entry_script_tags('chef-entrees') }}{% endblock %}
+
