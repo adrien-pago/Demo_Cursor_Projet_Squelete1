@@ -18,16 +18,20 @@
 ### Salarié (ROLE_EMPLOYEE)
 - ✅ Consulter les menus du jour des journées à venir
 - ✅ Faire une réservation :
-  - Choisir entre une formule «salade» ou «menu complet»
+  - Choisir entre une formule «salade», «menu complet» ou «Mess»
   - Sélectionner une entrée, un plat et un accompagnement (dans le cas d'un menu)
   - Choisir le mode de livraison
+  - Voir les descriptions des items via une icône info
 - ✅ Gérer les réservations :
-  - Visualiser les réservations passées et futures
+  - Visualiser les réservations passées et futures dans un tableau moderne
   - Voir les détails des plats réservés
   - Annuler une réservation avant qu'elle ne soit consommée (si autorisé)
-- ✅ Créditer son compte : Ajouter des fonds pour réserver des repas
+- ✅ Gérer son compte (`/employee/account`) :
+  - Créditer son compte : Ajouter des fonds pour réserver des repas
+  - Voir son solde actuel
+  - Voir ses informations personnelles (nom, email)
+  - Changer son mot de passe
 - ✅ Demander un mess : Formulaire pour demander une réservation spéciale par email
-- ✅ Voir son solde actuel
 
 ### Chef cuisinier (ROLE_CHEF)
 - ✅ Gérer les menus :
@@ -50,10 +54,21 @@
   - Voir les détails d'une réservation
   - Annuler des réservations non conformes
   - Marquer une réservation comme "servie"
-- ✅ Paramètres :
-  - Configurer les modes de livraison par défaut
-  - Configurer les types de cartes disponibles
+- ✅ Paramètres (`/chef/settings`) :
+  - Configurer les modes de livraison par défaut (Lieux)
+  - Configurer les types de cartes disponibles (Formules)
+  - Renommer les Lieux et Formules
+  - Supprimer les Lieux et Formules (avec vérification d'utilisation)
   - Aperçu consommateur (simulation de l'affichage pour les salariés)
+- ✅ Gestion des comptes utilisateurs (`/chef/accounts`) :
+  - Voir tous les comptes créés dans un tableau
+  - Rechercher par nom ou email
+  - Pagination (10 comptes par page)
+  - Tri alphabétique par défaut
+  - Modifier un compte (nom, email)
+  - Supprimer un compte (avec vérification des réservations)
+  - Créer un nouveau compte avec mot de passe aléatoire
+  - Empêche la modification/suppression de son propre compte
 
 ---
 
@@ -241,6 +256,18 @@
 
 # ROUTES ET CONTRÔLEURS
 
+## Routes Publiques
+
+### Page de connexion
+- **Route** : `/login` (GET/POST)
+- **Contrôleur** : `SecurityController::login()`
+- **Fonctionnalité** : 
+  - Formulaire de connexion
+  - Layout full-width et responsive
+  - Bouton "Se connecter" centré
+  - Navbar simplifiée (pas de menu burger, pas de boutons Login/Register)
+  - Section "Pas encore de compte ?" supprimée (création de compte désactivée)
+
 ## Routes Salariés (ROLE_EMPLOYEE)
 
 ### Écran d'accueil (Dashboard)
@@ -257,10 +284,20 @@
   - Swipe droite sur une date : ouvre interface réservation avec formule salade sélectionné
   - Clic sur une date : accède à la page de réservation (ou modification si réservation existe)
 
-### Créditer le compte
-- **Route** : `/employee/credit` (GET/POST)
-- **Contrôleur** : `EmployeeController::credit()`
-- **Fonctionnalité** : Formulaire pour ajouter de l'argent au compte
+### Gestion du compte
+- **Route** : `/employee/account` (GET)
+- **Contrôleur** : `EmployeeController::account()`
+- **Fonctionnalité** : 
+  - Affiche le solde actuel
+  - Affiche les informations personnelles (nom, email)
+  - Formulaire pour créditer le compte
+  - Formulaire pour changer le mot de passe
+- **Route** : `/employee/account/credit` (POST)
+- **Contrôleur** : `EmployeeController::creditBalance()`
+- **Fonctionnalité** : Crédite le compte et crée une transaction Wallet
+- **Route** : `/employee/account/change-password` (POST)
+- **Contrôleur** : `EmployeeController::changePassword()`
+- **Fonctionnalité** : Change le mot de passe de l'utilisateur
 
 ### Écran de réservation
 - **Route** : `/employee/reserve/{date}` (GET, affiche le formulaire)
@@ -394,9 +431,17 @@
 - **Contrôleur** : `ChefController::entrees()`, `plats()`, `accompagnements()`, `salades()`, etc.
 
 ### Voir les réservations
-- **Route** : `/chef/reservations`
+- **Route** : `/chef/reservations` (GET)
 - **Contrôleur** : `ChefController::reservations()`
-- **Fonctionnalité** : Liste de toutes les réservations avec filtres (date, statut)
+- **Fonctionnalité** : 
+  - Affichage de la date avec navigation (flèches gauche/droite)
+  - Flèche gauche désactivée si date = aujourd'hui
+  - Réservations groupées par formule (Salade, Restaurant, Mess)
+  - Affichage des détails pour chaque réservation
+  - Layout full-width et responsive
+- **Route** : `/chef/reservations/{date}/pdf` (GET)
+- **Contrôleur** : `ChefController::reservationsPdf()`
+- **Fonctionnalité** : Télécharge un PDF des réservations du jour avec formules, lieux et détails
 
 ### Détails d'une réservation
 - **Route** : `/chef/reservation/{id}`
@@ -410,9 +455,33 @@
 - **Route** : `/chef/settings` (GET/POST)
 - **Contrôleur** : `ChefController::settings()`
 - **Fonctionnalité** : 
-  - Configurer les modes de livraison par défaut (lieux)
-  - Configurer les types de cartes disponibles (Formule)
+  - Configurer les modes de livraison par défaut (Lieux)
+  - Configurer les types de cartes disponibles (Formules)
+  - Renommer les Lieux et Formules
+  - Supprimer les Lieux et Formules (avec vérification d'utilisation via AJAX)
+  - Modal de confirmation pour suppression
   - Gérer les paramètres généraux
+- **Route** : `/chef/settings/check-usage/{type}/{id}` (GET, AJAX)
+- **Contrôleur** : `ChefController::checkUsage()`
+- **Fonctionnalité** : Vérifie si un Lieu ou Formule est utilisé avant suppression
+
+### Gestion des comptes utilisateurs
+- **Route** : `/chef/accounts` (GET)
+- **Contrôleur** : `ChefController::accounts()`
+- **Fonctionnalité** : 
+  - Affiche tous les comptes dans un tableau (Nom, Email, Rôle, Actions)
+  - Recherche par nom ou email (soumission automatique si champ vidé)
+  - Pagination (10 comptes par page)
+  - Tri alphabétique par défaut
+- **Route** : `/chef/accounts/create` (POST)
+- **Contrôleur** : `ChefController::createAccount()`
+- **Fonctionnalité** : Crée un nouveau compte avec mot de passe aléatoire
+- **Route** : `/chef/accounts/{id}/edit` (POST)
+- **Contrôleur** : `ChefController::editAccount()`
+- **Fonctionnalité** : Modifie le nom et l'email d'un compte
+- **Route** : `/chef/accounts/{id}/delete` (POST)
+- **Contrôleur** : `ChefController::deleteAccount()`
+- **Fonctionnalité** : Supprime un compte (vérifie les réservations, empêche auto-suppression)
 
 ---
 
@@ -442,13 +511,11 @@ Ajouter les champs manquants et les relations.
 # TEMPLATES À CRÉER
 
 ## Templates Salariés
-- `templates/employee/dashboard.html.twig` (écran d'accueil avec tuiles de dates)
-- `templates/employee/reserve.html.twig` (écran de réservation - formule restaurant)
-- `templates/employee/reserve-salad.html.twig` (écran de réservation - formule salade)
-- `templates/employee/meal-details.html.twig` (pop-up détails d'un plat)
+- `templates/employee/dashboard.html.twig` (écran d'accueil avec tuiles de dates, filigrane "RÉSERVÉ")
+- `templates/employee/reserve.html.twig` (écran de réservation - toutes formules, modals descriptions)
+- `templates/employee/account.html.twig` (gestion du compte : solde, crédit, infos, changement mdp)
 - `templates/employee/mess.html.twig` (formulaire mess)
-- `templates/employee/credit.html.twig` (créditer le compte)
-- `templates/employee/reservations.html.twig` (historique des réservations)
+- `templates/employee/reservations.html.twig` (historique des réservations avec tableau moderne)
 
 ## Templates Chef
 - `templates/chef/agenda.html.twig` (écran agenda avec bandeaux mois et cartes jours)
@@ -467,9 +534,10 @@ Ajouter les champs manquants et les relations.
 - `templates/chef/salades/index.html.twig` (liste des salades)
 - `templates/chef/salades/new.html.twig` (créer une salade)
 - `templates/chef/salades/edit.html.twig` (modifier une salade)
-- `templates/chef/reservations/index.html.twig` (liste des réservations)
-- `templates/chef/reservations/details.html.twig` (détails d'une réservation)
-- `templates/chef/settings.html.twig` (paramètres : modes de livraison, types de cartes)
+- `templates/chef/reservations.html.twig` (liste des réservations par date, groupées par formule)
+- `templates/chef/reservations-pdf.html.twig` (template PDF pour téléchargement)
+- `templates/chef/settings.html.twig` (paramètres : modes de livraison, types de cartes, renommer/supprimer)
+- `templates/chef/accounts.html.twig` (gestion des comptes utilisateurs avec recherche, pagination, modals)
 
 ## Templates partagés
 - `templates/shared/date_tile.html.twig` (tuile de date pour l'accueil)
@@ -507,7 +575,7 @@ Ajouter les champs manquants et les relations.
 
 - **Header** :
   - Navigation de date avec flèches SVG (pas d'images, pas de fond blanc)
-  - Affichage du jour, numéro et mois en français
+  - Affichage du jour, numéro et mois en français sur une seule ligne (alignés à la même hauteur)
 - **Réservation existante** :
   - Si réservation existe déjà : message "Réservation déjà effectuée pour ce jour"
   - Affichage des détails de la réservation (formule, entrée, plat, accompagnement, salade)
@@ -536,12 +604,14 @@ Ajouter les champs manquants et les relations.
     - Message d'avertissement si demande déjà envoyée pour ce jour
     - Vérification via entité `MessRequest`
 - **Footer** :
-  - Bouton "Annuler" (icône cross) → Retour au dashboard
-  - Icônes de modes de livraison :
-    - `chef-hat.png` pour "Sur place"
-    - `shopping-bag.png` pour "À emporter"
-    - `Idelivery-truck.png` pour "Livraison"
-  - Clic sur une icône de livraison → Valide automatiquement la réservation si tous les éléments sont sélectionnés
+  - Bouton "Annuler" (moderne, texte) → Retour au dashboard
+  - Cadre "Valider" contenant :
+    - Icônes de modes de livraison avec labels :
+      - `chef-hat.png` pour "Sur place"
+      - `shopping-bag.png` pour "À emporter"
+      - `Idelivery-truck.png` pour "Livraison"
+    - Clic sur une icône de livraison → Valide automatiquement la réservation si tous les éléments sont sélectionnés
+    - Message d'alerte si éléments manquants : "Veuillez choisir votre repas avant de valider"
 - **Modal description** :
   - Affichage du nom et de la description de l'item
   - Message "Aucune information pour cet élément" si pas de description
@@ -552,7 +622,7 @@ Ajouter les champs manquants et les relations.
 
 - **Structure** :
   - Bandeaux de mois avec dégradé vert (pas bleu foncé)
-  - Cartes de jours organisées par mois
+  - Cartes de jours organisées par mois (arrondies)
   - Affichage des 60 prochains jours par défaut
 - **Affichage par date** :
   - Date et jour de la semaine à gauche
@@ -560,10 +630,9 @@ Ajouter les champs manquants et les relations.
   - Icônes de modes de livraison à droite (chef-hat, shopping-bag, Idelivery-truck)
   - Filigrane "RÉSERVÉ" en diagonal pour les jours avec réservations
 - **Formules affichées** :
-  - "Formule restaurant (X)" avec compteur de réservations
-  - "Formule salade (X)" avec compteur de réservations
-  - "Mess (X)" avec compteur de demandes Mess
-  - Les compteurs s'affichent même s'ils sont à 0
+  - "Formule restaurant (X)" avec compteur de réservations (toujours affiché, même si 0)
+  - "Formule salade (X)" avec compteur de réservations (toujours affiché, même si 0)
+  - "Mess (X)" avec compteur de demandes Mess (toujours affiché, même si 0)
 - **États visuels** :
   - Jour configuré : fond normal
   - Jour fermé (commentaire) : affichage du commentaire
@@ -603,10 +672,11 @@ Ajouter les champs manquants et les relations.
   - Flèche blanche (`choix-icon.png`) à côté de "Formule menu complet" → Ouvre interface de sélection des entrées, plats, accompagnements
   - Pas de flèche pour "Mess" (géré différemment)
 - **Navigation** :
-  - Footer avec boutons modernes (pas d'icônes) :
+  - Footer avec boutons modernes (texte, pas d'icônes) :
     - Bouton "Annuler" (gris) → Retour à l'agenda
     - Bouton "Valider" (vert avec dégradé) → Sauvegarde et retour à l'agenda
-  - Flèches autour de la date pour changer de date sans revenir en arrière
+  - Flèches SVG autour de la date pour changer de date sans revenir en arrière (pas de fond blanc)
+  - Modes non sélectionnés : fond gris clair (#f1f5f9)
 
 ## Interface Chef - Sélection des éléments (Salades / Menu complet)
 
@@ -616,13 +686,14 @@ Ajouter les champs manquants et les relations.
 - **Grille de salades** :
   - Cartes de salades avec nom
   - Salades sélectionnées : fond vert
-  - Salades non sélectionnées : fond bleu/transparent
+  - Salades non sélectionnées : fond gris clair (#f1f5f9)
   - Clic sur une carte → Toggle sélection
 - **Bouton créer** : FAB (Floating Action Button) avec "+" pour créer une nouvelle salade
 - **Modal création** : Formulaire pour créer une nouvelle salade (nom, description)
 - **Footer** :
-  - Bouton "Annuler" (gris) → Retour à `menu-day`
-  - Bouton "Valider" (vert) → Sauvegarde les sélections et retour à `menu-day`
+  - Boutons modernes texte (pas d'icônes) :
+    - Bouton "Annuler" (gris) → Retour à `menu-day`
+    - Bouton "Valider" (vert) → Sauvegarde les sélections et retour à `menu-day`
 
 ### Interface de sélection menu complet (`select-menu-complet`)
 - **Structure similaire** mais organisée en sections :
@@ -631,34 +702,118 @@ Ajouter les champs manquants et les relations.
   - Section "Accompagnements" avec grille d'accompagnements
 - **Boutons créer** : FAB pour chaque type (entrée, plat, accompagnement)
 - **Modals création** : Formulaires spécifiques pour chaque type
+- **Items non sélectionnés** : Fond gris clair (#f1f5f9)
 - **Footer** : Identique à `select-salades`
+
+## Interface Chef - Réservations
+
+- **Header** :
+  - Date avec navigation (flèches gauche/droite SVG)
+  - Flèche gauche désactivée (grisée) si date = aujourd'hui
+  - Bouton "Télécharger le PDF" pour exporter les réservations du jour
+- **Réservations groupées par formule** :
+  - **Salade** : `[NomUser] [NomSalade]` avec lieu à droite du nom
+  - **Restaurant** : `[NomUser] [NomEntree] [NomPlat] [NomAccompagnement]` avec lieu à droite du nom
+  - **Mess** : `[NomUser]` avec détails (convives, repas, commentaires) et lieu à droite du nom
+- **Layout** : Full-width, responsive, marges réduites
+- **PDF** :
+  - Titres de formules (Salade, Restaurant, Mess)
+  - Lieu affiché à droite du nom utilisateur
+  - Cartes réduites pour afficher plus de lignes par page
+  - Texte en noir pour Mess (pas blanc) pour meilleure lisibilité
+
+## Interface Chef - Paramètres
+
+- **Structure** :
+  - Cartes modernes avec headers en dégradé vert
+  - Section "Modes de livraison" (Lieux)
+  - Section "Types de cartes" (Formules)
+- **Fonctionnalités** :
+  - Renommer un Lieu ou Formule via champ input
+  - Supprimer un Lieu ou Formule via bouton (icône croix SVG)
+  - Modal de confirmation pour suppression avec vérification d'utilisation
+  - Vérification AJAX pour voir si un item est utilisé (réservations, compositions)
+  - Message d'avertissement si item utilisé
+  - Bouton "Ajouter Lieu" et "Ajouter Formule"
+  - Bouton "Enregistrer" pour sauvegarder les modifications
+
+## Interface Chef - Comptes
+
+- **Structure** :
+  - Tableau avec colonnes : Nom, Email, Rôle, Actions
+  - Barre de recherche par nom ou email (soumission automatique si champ vidé)
+  - Compteur de résultats
+  - Pagination (10 comptes par page)
+  - Tri alphabétique par défaut
+- **Actions** :
+  - Bouton "Modifier" (icône crayon SVG) → Ouvre modal pour modifier nom/email
+  - Bouton "Supprimer" (icône poubelle SVG) → Ouvre modal de confirmation
+  - Bouton "Créer un compte" → Ouvre modal de création
+- **Modal création** :
+  - Champs : Nom, Email, Mot de passe (avec bouton "Générer" pour mdp aléatoire), Rôle
+  - Le mot de passe généré est affiché pour copie
+- **Sécurité** :
+  - Empêche la modification/suppression de son propre compte
+  - Vérifie les réservations avant suppression
+  - Validation email unique
+- **Responsive** :
+  - Boutons d'action réduits sur mobile
+  - Pagination réduite sur mobile
+
+## Interface Salarié - Mon compte
+
+- **Structure** :
+  - Header avec dégradé vert
+  - Section "Solde actuel" : Affichage du solde avec formulaire de crédit
+  - Section "Informations personnelles" : Nom, Email
+  - Section "Changer le mot de passe" : Formulaire avec validation
+- **Fonctionnalités** :
+  - Créditer le compte (crée transaction Wallet)
+  - Changer le mot de passe (vérification mdp actuel, confirmation)
+  - Validation côté client et serveur
+- **Layout** : Full-width, responsive, marges réduites
+
+## Interface Login
+
+- **Structure** :
+  - Layout full-width et responsive
+  - Card centrée avec formulaire de connexion
+  - Bouton "Se connecter" centré
+- **Navbar** :
+  - Pas de boutons Login/Register (redondants)
+  - Pas de menu burger (pas de menu sur login)
+  - Titre "Chez Antho" avec logo centré
+- **Suppression** : Section "Pas encore de compte ? Créer un compte" (création de compte désactivée)
 
 ---
 
 # ASSETS À CRÉER
 
 ## Assets Salariés
-- `assets/employee/js/dashboard.js` (gestion des tuiles, swipe, navigation)
-- `assets/employee/styles/dashboard.scss` (tuiles de dates, styles réservations)
-- `assets/employee/js/reserve.js` (sélection de plats, bascule formule, validation)
-- `assets/employee/styles/reserve.scss` (formulaire de réservation)
-- `assets/employee/js/modal.js` (pop-up détails plat)
-- `assets/employee/styles/modal.scss` (styles modales)
+- `assets/employee/js/dashboard.js` (gestion des tuiles, navigation)
+- `assets/employee/styles/dashboard.scss` (tuiles de dates, filigrane "RÉSERVÉ")
+- `assets/employee/js/reserve.js` (sélection de plats, bascule formule, validation, modals descriptions)
+- `assets/employee/styles/reserve.scss` (formulaire de réservation, footer moderne, modals)
+- `assets/employee/js/reservations.js` (gestion du tableau de réservations)
+- `assets/employee/styles/reservations.scss` (tableau moderne responsive)
+- `assets/employee/js/account.js` (validation formulaires compte)
+- `assets/employee/styles/account.scss` (interface gestion compte)
 - `assets/employee/js/mess.js` (formulaire mess, envoi email)
 - `assets/employee/styles/mess.scss` (formulaire mess)
 
 ## Assets Chef
 - `assets/chef/js/agenda.js` (calendrier, navigation dates)
-- `assets/chef/styles/agenda.scss` (vue agenda)
+- `assets/chef/styles/agenda.scss` (vue agenda, dégradé vert)
 - `assets/chef/js/menu-day.js` (gestion modes livraison, commentaires, cartes)
-- `assets/chef/styles/menu-day.scss` (interface proposition jour)
-- `assets/chef/js/manage-meals.js` (sélection/désélection plats, aperçu)
-- `assets/chef/styles/manage-meals.scss` (gestion plats)
-- `assets/chef/js/entrees.js` (CRUD entrées)
-- `assets/chef/js/plats.js` (CRUD plats)
-- `assets/chef/js/accompagnements.js` (CRUD accompagnements)
-- `assets/chef/js/salades.js` (CRUD salades)
-- `assets/chef/styles/meals.scss` (styles communs CRUD)
+- `assets/chef/styles/menu-day.scss` (interface proposition jour, boutons modernes)
+- `assets/chef/js/select-items.js` (sélection salades/menu complet, création modals)
+- `assets/chef/styles/select-items.scss` (interfaces sélection, boutons modernes)
+- `assets/chef/js/reservations.js` (navigation dates réservations)
+- `assets/chef/styles/reservations.scss` (interface réservations, layout full-width)
+- `assets/chef/js/settings.js` (renommer/supprimer, vérification AJAX)
+- `assets/chef/styles/settings.scss` (interface paramètres moderne)
+- `assets/chef/js/accounts.js` (gestion comptes, modals, génération mdp)
+- `assets/chef/styles/accounts.scss` (tableau comptes, recherche, pagination responsive)
 
 ## Modifications webpack.config.js
 
@@ -667,16 +822,14 @@ Ajouter les nouvelles entries :
 .addEntry('employee-dashboard', './assets/employee/js/dashboard.js')
 .addEntry('employee-reserve', './assets/employee/js/reserve.js')
 .addEntry('employee-reservations', './assets/employee/js/reservations.js')
-.addEntry('employee-modal', './assets/employee/js/modal.js')
+.addEntry('employee-account', './assets/employee/js/account.js')
 .addEntry('employee-mess', './assets/employee/js/mess.js')
 .addEntry('chef-agenda', './assets/chef/js/agenda.js')
 .addEntry('chef-menu-day', './assets/chef/js/menu-day.js')
 .addEntry('chef-select-items', './assets/chef/js/select-items.js')
-.addEntry('chef-manage-meals', './assets/chef/js/manage-meals.js')
-.addEntry('chef-entrees', './assets/chef/js/entrees.js')
-.addEntry('chef-plats', './assets/chef/js/plats.js')
-.addEntry('chef-accompagnements', './assets/chef/js/accompagnements.js')
-.addEntry('chef-salades', './assets/chef/js/salades.js')
+.addEntry('chef-reservations', './assets/chef/js/reservations.js')
+.addEntry('chef-settings', './assets/chef/js/settings.js')
+.addEntry('chef-accounts', './assets/chef/js/accounts.js')
 ```
 
 **Note** : `chef-select-items` est utilisé pour les interfaces `select-salades` et `select-menu-complet`
@@ -974,10 +1127,8 @@ src/
 templates/
 ├── employee/
 │   ├── dashboard.html.twig
-│   ├── credit.html.twig
 │   ├── reserve.html.twig
-│   ├── reserve-salad.html.twig
-│   ├── meal-details.html.twig
+│   ├── account.html.twig
 │   ├── mess.html.twig
 │   └── reservations.html.twig (tableau moderne avec solde et bouton recharger)
 ├── chef/
@@ -1001,10 +1152,10 @@ templates/
 │   │   ├── index.html.twig
 │   │   ├── new.html.twig
 │   │   └── edit.html.twig
-│   ├── reservations/
-│   │   ├── index.html.twig
-│   │   └── details.html.twig
-│   └── settings.html.twig
+│   ├── reservations.html.twig
+│   ├── reservations-pdf.html.twig
+│   ├── settings.html.twig
+│   └── accounts.html.twig
 └── shared/
     └── (templates partagés optionnels - non utilisés dans l'implémentation actuelle)
 
@@ -1014,26 +1165,29 @@ assets/
 │   │   ├── dashboard.js
 │   │   ├── reserve.js (sélection auto formule restaurant, modals descriptions)
 │   │   ├── reservations.js
+│   │   ├── account.js
 │   │   └── mess.js
 │   └── styles/
 │       ├── dashboard.scss
 │       ├── reserve.scss
-│       ├── modal.scss
+│       ├── reservations.scss
+│       ├── account.scss
 │       └── mess.scss
 └── chef/
     ├── js/
     │   ├── agenda.js
     │   ├── menu-day.js
-    │   ├── manage-meals.js
-    │   ├── entrees.js
-    │   ├── plats.js
-    │   ├── accompagnements.js
-    │   └── salades.js
+    │   ├── select-items.js
+    │   ├── reservations.js
+    │   ├── settings.js
+    │   └── accounts.js
     └── styles/
         ├── agenda.scss
         ├── menu-day.scss
-        ├── manage-meals.scss
-        └── meals.scss
+        ├── select-items.scss
+        ├── reservations.scss
+        ├── settings.scss
+        └── accounts.scss
 ```
 
 ---
@@ -1124,16 +1278,19 @@ php bin/console doctrine:fixtures:load
 
 ### Version Desktop (≥992px)
 - **Structure** :
-  - "Bonjour [Nom]" à gauche (même taille de police que le titre)
-  - Titre "Chez Antho" au centre (gradient vert)
-  - Menu de navigation centré (Agenda, Réservations, Paramètres / Dashboard, Mes réservations)
+  - "Bonjour [Nom]" à gauche (même taille de police que le titre, espace entre "Bonjour" et le nom)
+  - Titre "Chez Antho" avec logo (`logo.png`) au centre (gradient vert)
+  - Menu de navigation centré avec espacement entre les boutons :
+    - Chef : Agenda, Réservations, Paramètres, Comptes
+    - Salarié : Dashboard, Mes réservations, Mon compte
   - Bouton Logout à droite
 - **Alignement** : Tous les éléments centrés horizontalement et verticalement
 - **Style** : Titre avec gradient vert (même style pour chef et salariés)
+- **Logo** : `logo.png` affiché à côté du titre (32x32px sur desktop)
 
 ### Version Mobile (<992px)
 - **Structure** :
-  - Titre "Chez Antho" à gauche (une seule ligne)
+  - Titre "Chez Antho" avec logo (`logo.png`) à gauche (une seule ligne, 28x28px)
   - Menu burger à droite (tout à droite de la navbar)
   - Espace entre titre et burger
 - **Menu déroulant** :
@@ -1142,6 +1299,7 @@ php bin/console doctrine:fixtures:load
   - Design moderne avec overlay et blur
   - Animation fluide
 - **Visibilité** : Menu burger et menu mobile complètement cachés sur desktop
+- **Page Login** : Menu burger et menu mobile cachés sur la page de login
 
 ## Twig Extension pour dates françaises
 
@@ -1168,6 +1326,12 @@ Créer `src/Twig/AppExtension.php` avec :
 10. **Comparaison d'entités** : Utiliser `getId()` pour comparer les entités Doctrine (pas `===`)
 11. **Normalisation des dates** : Normaliser les dates à `Y-m-d` pour les comparaisons en base de données
 12. **Chargement des collections** : Utiliser `em->refresh()` après flush pour recharger les collections Doctrine
+13. **PDF Generation** : Utiliser `dompdf/dompdf` pour générer des PDFs. DomPDF a des limitations avec Flexbox, utiliser `display: table` pour les layouts complexes
+14. **Recherche automatique** : Soumettre automatiquement le formulaire de recherche si le champ est vidé (pas de bouton "Effacer")
+15. **Boutons d'action** : Toujours garder les boutons modifier/supprimer côte à côte même sur mobile (`flex-wrap: nowrap`)
+16. **Logo navbar** : Intégrer `logo.png` à côté du titre "Chez Antho" dans toutes les navbars (desktop et mobile)
+17. **Tri alphabétique** : Utiliser `usort()` en PHP pour trier les utilisateurs par nom/email (éviter COALESCE en DQL)
+18. **Génération mot de passe** : Générer des mots de passe aléatoires forts côté client (JavaScript) pour la création de comptes
 
 ---
 
