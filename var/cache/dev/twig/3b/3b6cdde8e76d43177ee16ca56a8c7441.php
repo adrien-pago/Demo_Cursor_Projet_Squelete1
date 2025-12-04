@@ -86,61 +86,73 @@ class __TwigTemplate_210fc8d895ef7d9021edc492586a8943 extends Template
         // line 19
         yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_home");
         yield "\">
+        <img src=\"";
+        // line 20
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("icons/logo.png"), "html", null, true);
+        yield "\" alt=\"Logo\" class=\"navbar-logo\">
         Chez Antho
       </a>
       
       <div class=\"navbar-nav-desktop d-flex align-items-center gap-2 ms-auto\">
         ";
-        // line 24
-        if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 24, $this->source); })()), "user", [], "any", false, false, false, 24)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
-            // line 25
+        // line 25
+        if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 25, $this->source); })()), "user", [], "any", false, false, false, 25)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
+            // line 26
             yield "          ";
-            if (CoreExtension::inFilter("ROLE_CHEF", CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 25, $this->source); })()), "user", [], "any", false, false, false, 25), "roles", [], "any", false, false, false, 25))) {
-                // line 26
+            if (CoreExtension::inFilter("ROLE_CHEF", CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 26, $this->source); })()), "user", [], "any", false, false, false, 26), "roles", [], "any", false, false, false, 26))) {
+                // line 27
                 yield "            <a class=\"btn-nav ";
-                if ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 26, $this->source); })()), "request", [], "any", false, false, false, 26), "attributes", [], "any", false, false, false, 26), "get", ["_route"], "method", false, false, false, 26) == "chef_agenda")) {
+                if ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 27, $this->source); })()), "request", [], "any", false, false, false, 27), "attributes", [], "any", false, false, false, 27), "get", ["_route"], "method", false, false, false, 27) == "chef_agenda")) {
                     yield "active";
                 }
                 yield "\" href=\"";
                 yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("chef_agenda");
                 yield "\">Agenda</a>
             <a class=\"btn-nav ";
-                // line 27
-                if ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 27, $this->source); })()), "request", [], "any", false, false, false, 27), "attributes", [], "any", false, false, false, 27), "get", ["_route"], "method", false, false, false, 27) == "chef_reservations")) {
+                // line 28
+                if ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 28, $this->source); })()), "request", [], "any", false, false, false, 28), "attributes", [], "any", false, false, false, 28), "get", ["_route"], "method", false, false, false, 28) == "chef_reservations")) {
                     yield "active";
                 }
                 yield "\" href=\"";
                 yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("chef_reservations");
                 yield "\">Réservations</a>
             <a class=\"btn-nav ";
-                // line 28
-                if ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 28, $this->source); })()), "request", [], "any", false, false, false, 28), "attributes", [], "any", false, false, false, 28), "get", ["_route"], "method", false, false, false, 28) == "chef_settings")) {
+                // line 29
+                if ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 29, $this->source); })()), "request", [], "any", false, false, false, 29), "attributes", [], "any", false, false, false, 29), "get", ["_route"], "method", false, false, false, 29) == "chef_settings")) {
                     yield "active";
                 }
                 yield "\" href=\"";
                 yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("chef_settings");
                 yield "\">Paramètres</a>
+            <a class=\"btn-nav ";
+                // line 30
+                if ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 30, $this->source); })()), "request", [], "any", false, false, false, 30), "attributes", [], "any", false, false, false, 30), "get", ["_route"], "method", false, false, false, 30) == "chef_accounts")) {
+                    yield "active";
+                }
+                yield "\" href=\"";
+                yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("chef_accounts");
+                yield "\">Comptes</a>
           ";
             } else {
-                // line 30
+                // line 32
                 yield "            <a class=\"btn-nav ";
-                if ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 30, $this->source); })()), "request", [], "any", false, false, false, 30), "attributes", [], "any", false, false, false, 30), "get", ["_route"], "method", false, false, false, 30) == "employee_dashboard")) {
+                if ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 32, $this->source); })()), "request", [], "any", false, false, false, 32), "attributes", [], "any", false, false, false, 32), "get", ["_route"], "method", false, false, false, 32) == "employee_dashboard")) {
                     yield "active";
                 }
                 yield "\" href=\"";
                 yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("employee_dashboard");
                 yield "\">Dashboard</a>
             <a class=\"btn-nav ";
-                // line 31
-                if ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 31, $this->source); })()), "request", [], "any", false, false, false, 31), "attributes", [], "any", false, false, false, 31), "get", ["_route"], "method", false, false, false, 31) == "employee_reservations")) {
+                // line 33
+                if ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 33, $this->source); })()), "request", [], "any", false, false, false, 33), "attributes", [], "any", false, false, false, 33), "get", ["_route"], "method", false, false, false, 33) == "employee_reservations")) {
                     yield "active";
                 }
                 yield "\" href=\"";
                 yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("employee_reservations");
                 yield "\">Mes réservations</a>
             <a class=\"btn-nav ";
-                // line 32
-                if ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 32, $this->source); })()), "request", [], "any", false, false, false, 32), "attributes", [], "any", false, false, false, 32), "get", ["_route"], "method", false, false, false, 32) == "employee_account")) {
+                // line 34
+                if ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 34, $this->source); })()), "request", [], "any", false, false, false, 34), "attributes", [], "any", false, false, false, 34), "get", ["_route"], "method", false, false, false, 34) == "employee_account")) {
                     yield "active";
                 }
                 yield "\" href=\"";
@@ -148,95 +160,114 @@ class __TwigTemplate_210fc8d895ef7d9021edc492586a8943 extends Template
                 yield "\">Mon compte</a>
           ";
             }
-            // line 34
+            // line 36
             yield "          <a class=\"btn-nav btn-nav-logout\" href=\"";
             yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_logout");
             yield "\">Logout</a>
         ";
-        } else {
-            // line 36
-            yield "          <a class=\"btn-nav btn-nav-primary\" href=\"";
-            yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_login");
-            yield "\">Login</a>
-          <a class=\"btn-nav\" href=\"";
-            // line 37
-            yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_register");
-            yield "\">Register</a>
-        ";
         }
-        // line 39
+        // line 38
         yield "      </div>
     </div>
     
     ";
-        // line 43
-        yield "    <div class=\"navbar-mobile d-flex d-lg-none align-items-center justify-content-between w-100\">
+        // line 42
+        yield "    <div class=\"navbar-mobile d-flex d-lg-none align-items-center ";
+        if ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 42, $this->source); })()), "request", [], "any", false, false, false, 42), "attributes", [], "any", false, false, false, 42), "get", ["_route"], "method", false, false, false, 42) == "app_login")) {
+            yield "justify-content-center";
+        } else {
+            yield "justify-content-between";
+        }
+        yield " w-100\">
       <a class=\"navbar-brand-mobile\" href=\"";
-        // line 44
+        // line 43
         yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_home");
         yield "\">
+        <img src=\"";
+        // line 44
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("icons/logo.png"), "html", null, true);
+        yield "\" alt=\"Logo\" class=\"navbar-logo-mobile\">
         Chez Antho
       </a>
-      <button class=\"navbar-toggler\" type=\"button\" data-bs-toggle=\"collapse\" data-bs-target=\"#navbarMobileMenu\" aria-controls=\"navbarMobileMenu\" aria-expanded=\"false\" aria-label=\"Toggle navigation\">
-        <span class=\"navbar-toggler-icon\"></span>
-      </button>
-    </div>
+      ";
+        // line 47
+        if ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 47, $this->source); })()), "request", [], "any", false, false, false, 47), "attributes", [], "any", false, false, false, 47), "get", ["_route"], "method", false, false, false, 47) != "app_login")) {
+            // line 48
+            yield "        <button class=\"navbar-toggler\" type=\"button\" data-bs-toggle=\"collapse\" data-bs-target=\"#navbarMobileMenu\" aria-controls=\"navbarMobileMenu\" aria-expanded=\"false\" aria-label=\"Toggle navigation\">
+          <span class=\"navbar-toggler-icon\"></span>
+        </button>
+      ";
+        }
+        // line 52
+        yield "    </div>
     
     ";
-        // line 53
-        yield "    <div class=\"collapse navbar-collapse d-lg-none\" id=\"navbarMobileMenu\">
+        // line 55
+        yield "    <div class=\"collapse navbar-collapse d-lg-none ";
+        if ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 55, $this->source); })()), "request", [], "any", false, false, false, 55), "attributes", [], "any", false, false, false, 55), "get", ["_route"], "method", false, false, false, 55) == "app_login")) {
+            yield "d-none";
+        }
+        yield "\" id=\"navbarMobileMenu\">
       <div class=\"navbar-mobile-menu\">
         ";
-        // line 55
-        if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 55, $this->source); })()), "user", [], "any", false, false, false, 55)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
-            // line 56
+        // line 57
+        if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 57, $this->source); })()), "user", [], "any", false, false, false, 57)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
+            // line 58
             yield "          ";
-            if (CoreExtension::inFilter("ROLE_CHEF", CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 56, $this->source); })()), "user", [], "any", false, false, false, 56), "roles", [], "any", false, false, false, 56))) {
-                // line 57
+            if (CoreExtension::inFilter("ROLE_CHEF", CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 58, $this->source); })()), "user", [], "any", false, false, false, 58), "roles", [], "any", false, false, false, 58))) {
+                // line 59
                 yield "            <a class=\"navbar-mobile-item ";
-                if ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 57, $this->source); })()), "request", [], "any", false, false, false, 57), "attributes", [], "any", false, false, false, 57), "get", ["_route"], "method", false, false, false, 57) == "chef_agenda")) {
+                if ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 59, $this->source); })()), "request", [], "any", false, false, false, 59), "attributes", [], "any", false, false, false, 59), "get", ["_route"], "method", false, false, false, 59) == "chef_agenda")) {
                     yield "active";
                 }
                 yield "\" href=\"";
                 yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("chef_agenda");
                 yield "\">Agenda</a>
             <a class=\"navbar-mobile-item ";
-                // line 58
-                if ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 58, $this->source); })()), "request", [], "any", false, false, false, 58), "attributes", [], "any", false, false, false, 58), "get", ["_route"], "method", false, false, false, 58) == "chef_reservations")) {
+                // line 60
+                if ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 60, $this->source); })()), "request", [], "any", false, false, false, 60), "attributes", [], "any", false, false, false, 60), "get", ["_route"], "method", false, false, false, 60) == "chef_reservations")) {
                     yield "active";
                 }
                 yield "\" href=\"";
                 yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("chef_reservations");
                 yield "\">Réservations</a>
             <a class=\"navbar-mobile-item ";
-                // line 59
-                if ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 59, $this->source); })()), "request", [], "any", false, false, false, 59), "attributes", [], "any", false, false, false, 59), "get", ["_route"], "method", false, false, false, 59) == "chef_settings")) {
+                // line 61
+                if ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 61, $this->source); })()), "request", [], "any", false, false, false, 61), "attributes", [], "any", false, false, false, 61), "get", ["_route"], "method", false, false, false, 61) == "chef_settings")) {
                     yield "active";
                 }
                 yield "\" href=\"";
                 yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("chef_settings");
                 yield "\">Paramètres</a>
+            <a class=\"navbar-mobile-item ";
+                // line 62
+                if ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 62, $this->source); })()), "request", [], "any", false, false, false, 62), "attributes", [], "any", false, false, false, 62), "get", ["_route"], "method", false, false, false, 62) == "chef_accounts")) {
+                    yield "active";
+                }
+                yield "\" href=\"";
+                yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("chef_accounts");
+                yield "\">Comptes</a>
           ";
             } else {
-                // line 61
+                // line 64
                 yield "            <a class=\"navbar-mobile-item ";
-                if ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 61, $this->source); })()), "request", [], "any", false, false, false, 61), "attributes", [], "any", false, false, false, 61), "get", ["_route"], "method", false, false, false, 61) == "employee_dashboard")) {
+                if ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 64, $this->source); })()), "request", [], "any", false, false, false, 64), "attributes", [], "any", false, false, false, 64), "get", ["_route"], "method", false, false, false, 64) == "employee_dashboard")) {
                     yield "active";
                 }
                 yield "\" href=\"";
                 yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("employee_dashboard");
                 yield "\">Dashboard</a>
             <a class=\"navbar-mobile-item ";
-                // line 62
-                if ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 62, $this->source); })()), "request", [], "any", false, false, false, 62), "attributes", [], "any", false, false, false, 62), "get", ["_route"], "method", false, false, false, 62) == "employee_reservations")) {
+                // line 65
+                if ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 65, $this->source); })()), "request", [], "any", false, false, false, 65), "attributes", [], "any", false, false, false, 65), "get", ["_route"], "method", false, false, false, 65) == "employee_reservations")) {
                     yield "active";
                 }
                 yield "\" href=\"";
                 yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("employee_reservations");
                 yield "\">Mes réservations</a>
             <a class=\"navbar-mobile-item ";
-                // line 63
-                if ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 63, $this->source); })()), "request", [], "any", false, false, false, 63), "attributes", [], "any", false, false, false, 63), "get", ["_route"], "method", false, false, false, 63) == "employee_account")) {
+                // line 66
+                if ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 66, $this->source); })()), "request", [], "any", false, false, false, 66), "attributes", [], "any", false, false, false, 66), "get", ["_route"], "method", false, false, false, 66) == "employee_account")) {
                     yield "active";
                 }
                 yield "\" href=\"";
@@ -244,20 +275,10 @@ class __TwigTemplate_210fc8d895ef7d9021edc492586a8943 extends Template
                 yield "\">Mon compte</a>
           ";
             }
-            // line 65
+            // line 68
             yield "          <a class=\"navbar-mobile-item navbar-mobile-item-logout\" href=\"";
             yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_logout");
             yield "\">Logout</a>
-        ";
-        } else {
-            // line 67
-            yield "          <a class=\"navbar-mobile-item navbar-mobile-item-primary\" href=\"";
-            yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_login");
-            yield "\">Login</a>
-          <a class=\"navbar-mobile-item\" href=\"";
-            // line 68
-            yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_register");
-            yield "\">Register</a>
         ";
         }
         // line 70
@@ -414,7 +435,7 @@ class __TwigTemplate_210fc8d895ef7d9021edc492586a8943 extends Template
      */
     public function getDebugInfo(): array
     {
-        return array (  381 => 82,  365 => 75,  348 => 74,  332 => 8,  316 => 7,  299 => 5,  289 => 83,  287 => 82,  281 => 79,  276 => 76,  274 => 75,  270 => 74,  264 => 70,  259 => 68,  254 => 67,  248 => 65,  239 => 63,  231 => 62,  222 => 61,  213 => 59,  205 => 58,  196 => 57,  193 => 56,  191 => 55,  187 => 53,  176 => 44,  173 => 43,  168 => 39,  163 => 37,  158 => 36,  152 => 34,  143 => 32,  135 => 31,  126 => 30,  117 => 28,  109 => 27,  100 => 26,  97 => 25,  95 => 24,  87 => 19,  84 => 18,  78 => 16,  76 => 15,  73 => 14,  67 => 9,  64 => 8,  62 => 7,  57 => 5,  51 => 1,);
+        return array (  402 => 82,  386 => 75,  369 => 74,  353 => 8,  337 => 7,  320 => 5,  310 => 83,  308 => 82,  302 => 79,  297 => 76,  295 => 75,  291 => 74,  285 => 70,  279 => 68,  270 => 66,  262 => 65,  253 => 64,  244 => 62,  236 => 61,  228 => 60,  219 => 59,  216 => 58,  214 => 57,  206 => 55,  202 => 52,  196 => 48,  194 => 47,  188 => 44,  184 => 43,  175 => 42,  170 => 38,  164 => 36,  155 => 34,  147 => 33,  138 => 32,  129 => 30,  121 => 29,  113 => 28,  104 => 27,  101 => 26,  99 => 25,  91 => 20,  87 => 19,  84 => 18,  78 => 16,  76 => 15,  73 => 14,  67 => 9,  64 => 8,  62 => 7,  57 => 5,  51 => 1,);
     }
 
     public function getSourceContext(): Source
@@ -438,6 +459,7 @@ class __TwigTemplate_210fc8d895ef7d9021edc492586a8943 extends Template
       {% endif %}
       
       <a class=\"navbar-brand\" href=\"{{ path('app_home') }}\">
+        <img src=\"{{ asset('icons/logo.png') }}\" alt=\"Logo\" class=\"navbar-logo\">
         Chez Antho
       </a>
       
@@ -447,46 +469,45 @@ class __TwigTemplate_210fc8d895ef7d9021edc492586a8943 extends Template
             <a class=\"btn-nav {% if app.request.attributes.get('_route') == 'chef_agenda' %}active{% endif %}\" href=\"{{ path('chef_agenda') }}\">Agenda</a>
             <a class=\"btn-nav {% if app.request.attributes.get('_route') == 'chef_reservations' %}active{% endif %}\" href=\"{{ path('chef_reservations') }}\">Réservations</a>
             <a class=\"btn-nav {% if app.request.attributes.get('_route') == 'chef_settings' %}active{% endif %}\" href=\"{{ path('chef_settings') }}\">Paramètres</a>
+            <a class=\"btn-nav {% if app.request.attributes.get('_route') == 'chef_accounts' %}active{% endif %}\" href=\"{{ path('chef_accounts') }}\">Comptes</a>
           {% else %}
             <a class=\"btn-nav {% if app.request.attributes.get('_route') == 'employee_dashboard' %}active{% endif %}\" href=\"{{ path('employee_dashboard') }}\">Dashboard</a>
             <a class=\"btn-nav {% if app.request.attributes.get('_route') == 'employee_reservations' %}active{% endif %}\" href=\"{{ path('employee_reservations') }}\">Mes réservations</a>
             <a class=\"btn-nav {% if app.request.attributes.get('_route') == 'employee_account' %}active{% endif %}\" href=\"{{ path('employee_account') }}\">Mon compte</a>
           {% endif %}
           <a class=\"btn-nav btn-nav-logout\" href=\"{{ path('app_logout') }}\">Logout</a>
-        {% else %}
-          <a class=\"btn-nav btn-nav-primary\" href=\"{{ path('app_login') }}\">Login</a>
-          <a class=\"btn-nav\" href=\"{{ path('app_register') }}\">Register</a>
         {% endif %}
       </div>
     </div>
     
     {# Mobile : Titre à gauche + Burger à droite #}
-    <div class=\"navbar-mobile d-flex d-lg-none align-items-center justify-content-between w-100\">
+    <div class=\"navbar-mobile d-flex d-lg-none align-items-center {% if app.request.attributes.get('_route') == 'app_login' %}justify-content-center{% else %}justify-content-between{% endif %} w-100\">
       <a class=\"navbar-brand-mobile\" href=\"{{ path('app_home') }}\">
+        <img src=\"{{ asset('icons/logo.png') }}\" alt=\"Logo\" class=\"navbar-logo-mobile\">
         Chez Antho
       </a>
-      <button class=\"navbar-toggler\" type=\"button\" data-bs-toggle=\"collapse\" data-bs-target=\"#navbarMobileMenu\" aria-controls=\"navbarMobileMenu\" aria-expanded=\"false\" aria-label=\"Toggle navigation\">
-        <span class=\"navbar-toggler-icon\"></span>
-      </button>
+      {% if app.request.attributes.get('_route') != 'app_login' %}
+        <button class=\"navbar-toggler\" type=\"button\" data-bs-toggle=\"collapse\" data-bs-target=\"#navbarMobileMenu\" aria-controls=\"navbarMobileMenu\" aria-expanded=\"false\" aria-label=\"Toggle navigation\">
+          <span class=\"navbar-toggler-icon\"></span>
+        </button>
+      {% endif %}
     </div>
     
     {# Menu mobile déroulant #}
-    <div class=\"collapse navbar-collapse d-lg-none\" id=\"navbarMobileMenu\">
+    <div class=\"collapse navbar-collapse d-lg-none {% if app.request.attributes.get('_route') == 'app_login' %}d-none{% endif %}\" id=\"navbarMobileMenu\">
       <div class=\"navbar-mobile-menu\">
         {% if app.user %}
           {% if 'ROLE_CHEF' in app.user.roles %}
             <a class=\"navbar-mobile-item {% if app.request.attributes.get('_route') == 'chef_agenda' %}active{% endif %}\" href=\"{{ path('chef_agenda') }}\">Agenda</a>
             <a class=\"navbar-mobile-item {% if app.request.attributes.get('_route') == 'chef_reservations' %}active{% endif %}\" href=\"{{ path('chef_reservations') }}\">Réservations</a>
             <a class=\"navbar-mobile-item {% if app.request.attributes.get('_route') == 'chef_settings' %}active{% endif %}\" href=\"{{ path('chef_settings') }}\">Paramètres</a>
+            <a class=\"navbar-mobile-item {% if app.request.attributes.get('_route') == 'chef_accounts' %}active{% endif %}\" href=\"{{ path('chef_accounts') }}\">Comptes</a>
           {% else %}
             <a class=\"navbar-mobile-item {% if app.request.attributes.get('_route') == 'employee_dashboard' %}active{% endif %}\" href=\"{{ path('employee_dashboard') }}\">Dashboard</a>
             <a class=\"navbar-mobile-item {% if app.request.attributes.get('_route') == 'employee_reservations' %}active{% endif %}\" href=\"{{ path('employee_reservations') }}\">Mes réservations</a>
             <a class=\"navbar-mobile-item {% if app.request.attributes.get('_route') == 'employee_account' %}active{% endif %}\" href=\"{{ path('employee_account') }}\">Mon compte</a>
           {% endif %}
           <a class=\"navbar-mobile-item navbar-mobile-item-logout\" href=\"{{ path('app_logout') }}\">Logout</a>
-        {% else %}
-          <a class=\"navbar-mobile-item navbar-mobile-item-primary\" href=\"{{ path('app_login') }}\">Login</a>
-          <a class=\"navbar-mobile-item\" href=\"{{ path('app_register') }}\">Register</a>
         {% endif %}
       </div>
     </div>

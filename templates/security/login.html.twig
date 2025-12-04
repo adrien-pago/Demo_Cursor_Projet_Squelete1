@@ -6,7 +6,7 @@
 
 {% block body %}
 
-<div class="d-flex justify-content-center align-items-center w-100">
+<div class="login-wrapper">
   <div class="auth-card">
     <h1>Connexion</h1>
     {% if error %}
@@ -28,9 +28,6 @@
         <span>Se connecter</span>
       </button>
     </form>
-    <p class="mt-4 text-center">
-      Pas de compte ? <a href="{{ path('app_register') }}">Créer un compte</a>
-    </p>
   </div>
 </div>
 

@@ -16,10 +16,12 @@ use App\Entity\StatutCommande;
 use App\Repository\CarteDuJourRepository;
 use App\Repository\MessRequestRepository;
 use App\Repository\ReservationRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -1312,6 +1314,173 @@ final class ChefController extends AbstractController
             'isUsed' => $isUsed,
             'message' => $message,
         ]);
+    }
+
+    #[Route('/chef/accounts', name: 'chef_accounts', methods: ['GET'])]
+    public function accounts(Request $request, UserRepository $userRepo): Response
+    {
+        $search = trim($request->query->get('search', ''));
+        $page = max(1, (int) $request->query->get('page', 1));
+        $perPage = 10;
+        
+        $queryBuilder = $userRepo->createQueryBuilder('u');
+        
+        if (!empty($search)) {
+            $queryBuilder
+                ->where('u.name LIKE :search OR u.email LIKE :search')
+                ->setParameter('search', '%' . $search . '%');
+        }
+        
+        // Récupérer tous les utilisateurs pour le tri
+        $allUsers = $queryBuilder->getQuery()->getResult();
+        
+        // Trier par nom (ou email si pas de nom) par ordre alphabétique
+        usort($allUsers, function($a, $b) {
+            $nameA = $a->getName() ?? $a->getEmail();
+            $nameB = $b->getName() ?? $b->getEmail();
+            return strcasecmp($nameA, $nameB);
+        });
+        
+        // Calculer le total et la pagination
+        $totalUsers = count($allUsers);
+        $totalPages = max(1, (int) ceil($totalUsers / $perPage));
+        $page = min($page, $totalPages);
+        
+        // Extraire la page demandée
+        $users = array_slice($allUsers, ($page - 1) * $perPage, $perPage);
+        
+        return $this->render('chef/accounts.html.twig', [
+            'users' => $users,
+            'search' => $search,
+            'page' => $page,
+            'totalPages' => $totalPages,
+            'totalUsers' => $totalUsers,
+        ]);
+    }
+
+    #[Route('/chef/accounts/create', name: 'chef_accounts_create', methods: ['POST'])]
+    public function createAccount(Request $request, UserRepository $userRepo, EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher): Response
+    {
+        $name = trim($request->request->get('name', ''));
+        $email = trim($request->request->get('email', ''));
+        $password = trim($request->request->get('password', ''));
+        $role = $request->request->get('role', 'ROLE_EMPLOYEE');
+
+        if (empty($email)) {
+            $this->addFlash('danger', 'L\'email est requis.');
+            return $this->redirectToRoute('chef_accounts');
+        }
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $this->addFlash('danger', 'L\'email n\'est pas valide.');
+            return $this->redirectToRoute('chef_accounts');
+        }
+
+        if (empty($password)) {
+            $this->addFlash('danger', 'Le mot de passe est requis.');
+            return $this->redirectToRoute('chef_accounts');
+        }
+
+        if (strlen($password) < 8) {
+            $this->addFlash('danger', 'Le mot de passe doit contenir au moins 8 caractères.');
+            return $this->redirectToRoute('chef_accounts');
+        }
+
+        // Vérifier si l'email est déjà utilisé
+        $existingUser = $userRepo->findOneBy(['email' => $email]);
+        if ($existingUser) {
+            $this->addFlash('danger', 'Cet email est déjà utilisé.');
+            return $this->redirectToRoute('chef_accounts');
+        }
+        
+        $user = new \App\Entity\User();
+        $user->setEmail($email)
+            ->setName($name ?: null)
+            ->setRoles([$role])
+            ->setCompteVerif(true)
+            ->setBalance('0.00');
+        
+        if ($role === 'ROLE_CHEF') {
+            $user->setAdminVerif(true);
+        }
+        
+        $user->setPassword($passwordHasher->hashPassword($user, $password));
+        
+        $em->persist($user);
+        $em->flush();
+
+        $this->addFlash('success', 'Le compte a été créé avec succès.');
+        return $this->redirectToRoute('chef_accounts');
+    }
+
+    #[Route('/chef/accounts/{id}/edit', name: 'chef_accounts_edit', methods: ['POST'])]
+    public function editAccount(int $id, Request $request, UserRepository $userRepo, EntityManagerInterface $em): Response
+    {
+        $user = $userRepo->find($id);
+        
+        if (!$user) {
+            $this->addFlash('danger', 'Utilisateur introuvable.');
+            return $this->redirectToRoute('chef_accounts');
+        }
+
+        // Empêcher la modification du compte actuel
+        if ($user->getId() === $this->getUser()->getId()) {
+            $this->addFlash('danger', 'Vous ne pouvez pas modifier votre propre compte depuis cette interface.');
+            return $this->redirectToRoute('chef_accounts');
+        }
+
+        $name = trim($request->request->get('name', ''));
+        $email = trim($request->request->get('email', ''));
+
+        if (empty($email)) {
+            $this->addFlash('danger', 'L\'email est requis.');
+            return $this->redirectToRoute('chef_accounts');
+        }
+
+        // Vérifier si l'email est déjà utilisé par un autre utilisateur
+        $existingUser = $userRepo->findOneBy(['email' => $email]);
+        if ($existingUser && $existingUser->getId() !== $user->getId()) {
+            $this->addFlash('danger', 'Cet email est déjà utilisé par un autre compte.');
+            return $this->redirectToRoute('chef_accounts');
+        }
+
+        $user->setName($name ?: null);
+        $user->setEmail($email);
+        
+        $em->flush();
+
+        $this->addFlash('success', 'Le compte a été modifié avec succès.');
+        return $this->redirectToRoute('chef_accounts');
+    }
+
+    #[Route('/chef/accounts/{id}/delete', name: 'chef_accounts_delete', methods: ['POST'])]
+    public function deleteAccount(int $id, Request $request, UserRepository $userRepo, EntityManagerInterface $em): Response
+    {
+        $user = $userRepo->find($id);
+        
+        if (!$user) {
+            $this->addFlash('danger', 'Utilisateur introuvable.');
+            return $this->redirectToRoute('chef_accounts');
+        }
+
+        // Empêcher la suppression du compte actuel
+        if ($user->getId() === $this->getUser()->getId()) {
+            $this->addFlash('danger', 'Vous ne pouvez pas supprimer votre propre compte.');
+            return $this->redirectToRoute('chef_accounts');
+        }
+
+        // Vérifier si l'utilisateur a des réservations
+        if (!$user->getReservations()->isEmpty()) {
+            $this->addFlash('danger', 'Impossible de supprimer ce compte car il possède des réservations.');
+            return $this->redirectToRoute('chef_accounts');
+        }
+
+        $userName = $user->getName() ?? $user->getEmail();
+        $em->remove($user);
+        $em->flush();
+
+        $this->addFlash('success', "Le compte de {$userName} a été supprimé avec succès.");
+        return $this->redirectToRoute('chef_accounts');
     }
 }
 

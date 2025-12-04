@@ -17,7 +17,7 @@ return [[
                 '/build/security-login.6a667623.js',
             ],
             'css' => [
-                '/build/security-login.03d2d64d.css',
+                '/build/security-login.98f2bcf6.css',
             ],
         ],
         'security-register' => [
@@ -27,7 +27,7 @@ return [[
                 '/build/security-register.ef775b2d.js',
             ],
             'css' => [
-                '/build/security-register.54de80c0.css',
+                '/build/security-register.40b976b0.css',
             ],
         ],
         'app-home' => [
@@ -37,7 +37,7 @@ return [[
                 '/build/app-home.bdb42e01.js',
             ],
             'css' => [
-                '/build/app-home.bff16bec.css',
+                '/build/app-home.73b8462b.css',
             ],
         ],
         'employee-dashboard' => [
@@ -47,17 +47,17 @@ return [[
                 '/build/employee-dashboard.ed0a0279.js',
             ],
             'css' => [
-                '/build/employee-dashboard.86e7f347.css',
+                '/build/employee-dashboard.04d0d351.css',
             ],
         ],
         'employee-reserve' => [
             'js' => [
                 '/build/runtime.d47beb02.js',
                 '/build/336.39c7dcd4.js',
-                '/build/employee-reserve.b2d20b07.js',
+                '/build/employee-reserve.c8661bc8.js',
             ],
             'css' => [
-                '/build/employee-reserve.7869a26e.css',
+                '/build/employee-reserve.e484f803.css',
             ],
         ],
         'employee-reservations' => [
@@ -67,7 +67,7 @@ return [[
                 '/build/employee-reservations.bd49d3b0.js',
             ],
             'css' => [
-                '/build/employee-reservations.f45ae0df.css',
+                '/build/employee-reservations.69cdbb6c.css',
             ],
         ],
         'employee-modal' => [
@@ -77,7 +77,7 @@ return [[
                 '/build/employee-modal.2aeffdbd.js',
             ],
             'css' => [
-                '/build/employee-modal.24ede97a.css',
+                '/build/employee-modal.784cffd8.css',
             ],
         ],
         'employee-mess' => [
@@ -87,7 +87,17 @@ return [[
                 '/build/employee-mess.1dd91d6b.js',
             ],
             'css' => [
-                '/build/employee-mess.c5fdd36d.css',
+                '/build/employee-mess.b6200df1.css',
+            ],
+        ],
+        'employee-account' => [
+            'js' => [
+                '/build/runtime.d47beb02.js',
+                '/build/336.39c7dcd4.js',
+                '/build/employee-account.67342150.js',
+            ],
+            'css' => [
+                '/build/employee-account.28f54124.css',
             ],
         ],
         'chef-agenda' => [
@@ -97,7 +107,7 @@ return [[
                 '/build/chef-agenda.b34c5a9e.js',
             ],
             'css' => [
-                '/build/chef-agenda.5c7a9f5d.css',
+                '/build/chef-agenda.4b13e630.css',
             ],
         ],
         'chef-menu-day' => [
@@ -107,7 +117,7 @@ return [[
                 '/build/chef-menu-day.66f9cf3a.js',
             ],
             'css' => [
-                '/build/chef-menu-day.5a766086.css',
+                '/build/chef-menu-day.78d4b62c.css',
             ],
         ],
         'chef-manage-meals' => [
@@ -117,7 +127,7 @@ return [[
                 '/build/chef-manage-meals.30eaf823.js',
             ],
             'css' => [
-                '/build/chef-manage-meals.d8217cb4.css',
+                '/build/chef-manage-meals.9de5d762.css',
             ],
         ],
         'chef-select-items' => [
@@ -127,7 +137,36 @@ return [[
                 '/build/chef-select-items.30684b50.js',
             ],
             'css' => [
-                '/build/chef-select-items.f2a24b1d.css',
+                '/build/chef-select-items.61064e35.css',
+            ],
+        ],
+        'chef-reservations' => [
+            'js' => [
+                '/build/runtime.d47beb02.js',
+                '/build/336.39c7dcd4.js',
+                '/build/chef-reservations.fe9e5b3e.js',
+            ],
+            'css' => [
+                '/build/chef-reservations.24857f37.css',
+            ],
+        ],
+        'chef-settings' => [
+            'js' => [
+                '/build/runtime.d47beb02.js',
+                '/build/336.39c7dcd4.js',
+                '/build/chef-settings.29f58148.js',
+            ],
+            'css' => [
+                '/build/chef-settings.c48ef458.css',
+            ],
+        ],
+        'chef-accounts' => [
+            'js' => [
+                '/build/runtime.d47beb02.js',
+                '/build/chef-accounts.06e844a1.js',
+            ],
+            'css' => [
+                '/build/chef-accounts.8717655c.css',
             ],
         ],
         'chef-entrees' => [
@@ -137,7 +176,7 @@ return [[
                 '/build/chef-entrees.31a9b4ca.js',
             ],
             'css' => [
-                '/build/534.c5fdd36d.css',
+                '/build/534.b6200df1.css',
             ],
         ],
         'chef-plats' => [
@@ -147,7 +186,7 @@ return [[
                 '/build/chef-plats.2b0140fe.js',
             ],
             'css' => [
-                '/build/534.c5fdd36d.css',
+                '/build/534.b6200df1.css',
             ],
         ],
         'chef-accompagnements' => [
@@ -157,7 +196,7 @@ return [[
                 '/build/chef-accompagnements.c914d35b.js',
             ],
             'css' => [
-                '/build/534.c5fdd36d.css',
+                '/build/534.b6200df1.css',
             ],
         ],
         'chef-salades' => [
@@ -167,7 +206,7 @@ return [[
                 '/build/chef-salades.be73bd43.js',
             ],
             'css' => [
-                '/build/534.c5fdd36d.css',
+                '/build/534.b6200df1.css',
             ],
         ],
     ],

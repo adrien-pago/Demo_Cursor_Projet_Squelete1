@@ -128,6 +128,7 @@ body {
       margin: 0 1rem;
       display: flex;
       align-items: center;
+      gap: 0.5rem;
       line-height: 1;
       
       // Style par défaut (gradient vert) - même style pour chef et salariés
@@ -135,6 +136,13 @@ body {
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+      
+      .navbar-logo {
+        width: 32px;
+        height: 32px;
+        object-fit: contain;
+        flex-shrink: 0;
+      }
       
       &:hover {
         transform: scale(1.05);
@@ -224,12 +232,22 @@ body {
       z-index: 1;
       white-space: nowrap;
       flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
       
       // Style par défaut (gradient vert)
       background: var(--brand-gradient);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+      
+      .navbar-logo-mobile {
+        width: 28px;
+        height: 28px;
+        object-fit: contain;
+        flex-shrink: 0;
+      }
       
       // Style pour "Le 200" (bleu)
       &.brand-le200 {

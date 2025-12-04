@@ -18,6 +18,7 @@ Encore
   .addEntry('chef-select-items', './assets/chef/js/select-items.js')
   .addEntry('chef-reservations', './assets/chef/js/reservations.js')
   .addEntry('chef-settings', './assets/chef/js/settings.js')
+  .addEntry('chef-accounts', './assets/chef/js/accounts.js')
   .addEntry('chef-entrees', './assets/chef/js/entrees.js')
   .addEntry('chef-plats', './assets/chef/js/plats.js')
   .addEntry('chef-accompagnements', './assets/chef/js/accompagnements.js')

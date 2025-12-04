@@ -102,7 +102,7 @@ class __TwigTemplate_30280d94b141da36dc2d41be046cf341 extends Template
 
         // line 8
         yield "
-<div class=\"d-flex justify-content-center align-items-center w-100\">
+<div class=\"login-wrapper\">
   <div class=\"auth-card\">
     <h1>Connexion</h1>
     ";
@@ -138,12 +138,6 @@ class __TwigTemplate_30280d94b141da36dc2d41be046cf341 extends Template
         <span>Se connecter</span>
       </button>
     </form>
-    <p class=\"mt-4 text-center\">
-      Pas de compte ? <a href=\"";
-        // line 32
-        yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_register");
-        yield "\">Créer un compte</a>
-    </p>
   </div>
 </div>
 
@@ -154,7 +148,7 @@ class __TwigTemplate_30280d94b141da36dc2d41be046cf341 extends Template
         yield from [];
     }
 
-    // line 39
+    // line 36
     /**
      * @return iterable<null|scalar|\Stringable>
      */
@@ -192,7 +186,7 @@ class __TwigTemplate_30280d94b141da36dc2d41be046cf341 extends Template
      */
     public function getDebugInfo(): array
     {
-        return array (  158 => 39,  144 => 32,  135 => 26,  126 => 20,  121 => 17,  115 => 14,  112 => 13,  110 => 12,  104 => 8,  94 => 7,  77 => 5,  60 => 3,  43 => 1,);
+        return array (  152 => 36,  135 => 26,  126 => 20,  121 => 17,  115 => 14,  112 => 13,  110 => 12,  104 => 8,  94 => 7,  77 => 5,  60 => 3,  43 => 1,);
     }
 
     public function getSourceContext(): Source
@@ -205,7 +199,7 @@ class __TwigTemplate_30280d94b141da36dc2d41be046cf341 extends Template
 
 {% block body %}
 
-<div class=\"d-flex justify-content-center align-items-center w-100\">
+<div class=\"login-wrapper\">
   <div class=\"auth-card\">
     <h1>Connexion</h1>
     {% if error %}
@@ -227,9 +221,6 @@ class __TwigTemplate_30280d94b141da36dc2d41be046cf341 extends Template
         <span>Se connecter</span>
       </button>
     </form>
-    <p class=\"mt-4 text-center\">
-      Pas de compte ? <a href=\"{{ path('app_register') }}\">Créer un compte</a>
-    </p>
   </div>
 </div>
 

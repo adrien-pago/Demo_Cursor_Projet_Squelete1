@@ -1,0 +1,194 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des comptes{% endblock %}
+
+{% block stylesheets %}{{ encore_entry_link_tags('chef-accounts') }}{% endblock %}
+
+{% block body %}
+<div class="chef-accounts-wrapper">
+    <div class="accounts-header">
+        <h1>Gestion des comptes</h1>
+        <button class="btn-create" onclick="openCreateModal()">Créer un compte</button>
+    </div>
+
+    <div class="accounts-content">
+        <div class="accounts-toolbar">
+            <form method="GET" action="{{ path('chef_accounts') }}" class="search-form" id="searchForm">
+                <input type="text" name="search" value="{{ search }}" placeholder="Rechercher par nom ou email..." class="search-input" id="searchInput">
+                <button type="submit" class="btn-search">Rechercher</button>
+            </form>
+            <div class="accounts-count">
+                <span>{{ totalUsers }} compte(s) trouvé(s)</span>
+            </div>
+        </div>
+
+        {% if users is empty %}
+            <div class="empty-state">
+                <p>Aucun compte trouvé{% if search %} pour "{{ search }}"{% endif %}.</p>
+            </div>
+        {% else %}
+            <div class="accounts-table-container">
+                <table class="accounts-table">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Email</th>
+                            <th>Rôle</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                            <tr>
+                                <td class="user-name">{{ user.name ?? 'Non renseigné' }}</td>
+                                <td class="user-email">{{ user.email }}</td>
+                                <td class="user-role">
+                                    {% if 'ROLE_CHEF' in user.roles %}
+                                        <span class="role-badge role-chef">Chef</span>
+                                    {% else %}
+                                        <span class="role-badge role-employee">Salarié</span>
+                                    {% endif %}
+                                </td>
+                                <td class="user-actions">
+                                    <button class="btn-icon btn-edit" onclick="openEditModal({{ user.id }}, '{{ user.name|e('js') }}', '{{ user.email|e('js') }}')" title="Modifier">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                        </svg>
+                                    </button>
+                                    {% if user.id != app.user.id %}
+                                        <button class="btn-icon btn-delete" onclick="openDeleteModal({{ user.id }}, '{{ (user.name ?? user.email)|e('js') }}')" title="Supprimer">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <polyline points="3 6 5 6 21 6"></polyline>
+                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                                <line x1="10" y1="11" x2="10" y2="17"></line>
+                                                <line x1="14" y1="11" x2="14" y2="17"></line>
+                                            </svg>
+                                        </button>
+                                    {% else %}
+                                        <span class="btn-disabled">Vous</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if totalPages > 1 %}
+                <div class="pagination">
+                    {% if page > 1 %}
+                        <a href="{{ path('chef_accounts', {page: page - 1, search: search}) }}" class="pagination-btn">‹ Précédent</a>
+                    {% else %}
+                        <span class="pagination-btn disabled">‹ Précédent</span>
+                    {% endif %}
+                    
+                    <span class="pagination-info">Page {{ page }} sur {{ totalPages }}</span>
+                    
+                    {% if page < totalPages %}
+                        <a href="{{ path('chef_accounts', {page: page + 1, search: search}) }}" class="pagination-btn">Suivant ›</a>
+                    {% else %}
+                        <span class="pagination-btn disabled">Suivant ›</span>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+
+{# Modal de modification #}
+<div id="editModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Modifier le compte</h2>
+            <button class="modal-close" onclick="closeEditModal()">&times;</button>
+        </div>
+        <form id="editForm" method="POST" action="">
+            <input type="hidden" name="_token" value="{{ csrf_token('edit_account') }}">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="editName">Nom</label>
+                    <input type="text" id="editName" name="name" class="form-control" placeholder="Nom de l'utilisateur">
+                </div>
+                <div class="form-group">
+                    <label for="editEmail">Email *</label>
+                    <input type="email" id="editEmail" name="email" class="form-control" required placeholder="email@example.com">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" onclick="closeEditModal()">Annuler</button>
+                <button type="submit" class="btn-save">Enregistrer</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{# Modal de création #}
+<div id="createModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Créer un compte</h2>
+            <button class="modal-close" onclick="closeCreateModal()">&times;</button>
+        </div>
+        <form id="createForm" method="POST" action="{{ path('chef_accounts_create') }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('create_account') }}">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="createName">Nom</label>
+                    <input type="text" id="createName" name="name" class="form-control" placeholder="Nom de l'utilisateur">
+                </div>
+                <div class="form-group">
+                    <label for="createEmail">Email *</label>
+                    <input type="email" id="createEmail" name="email" class="form-control" required placeholder="email@example.com">
+                </div>
+                <div class="form-group">
+                    <label for="createPassword">Mot de passe *</label>
+                    <div class="password-input-group">
+                        <input type="text" id="createPassword" name="password" class="form-control" required placeholder="Mot de passe">
+                        <button type="button" class="btn-generate-password" onclick="generateRandomPassword()" title="Générer un mot de passe aléatoire">
+                            Générer
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="createRole">Rôle *</label>
+                    <select id="createRole" name="role" class="form-control" required>
+                        <option value="ROLE_EMPLOYEE">Salarié</option>
+                        <option value="ROLE_CHEF">Chef</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" onclick="closeCreateModal()">Annuler</button>
+                <button type="submit" class="btn-save">Créer</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{# Modal de suppression #}
+<div id="deleteModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Supprimer le compte</h2>
+            <button class="modal-close" onclick="closeDeleteModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p class="warning-message">
+                Êtes-vous sûr de vouloir supprimer le compte de <strong id="deleteUserName"></strong> ?
+            </p>
+            <p class="warning-note">Cette action est irréversible. Le compte et toutes ses données seront définitivement supprimés.</p>
+        </div>
+        <form id="deleteForm" method="POST" action="">
+            <input type="hidden" name="_token" value="{{ csrf_token('delete_account') }}">
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" onclick="closeDeleteModal()">Annuler</button>
+                <button type="submit" class="btn-delete-confirm">Supprimer</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}{{ encore_entry_script_tags('chef-accounts') }}{% endblock %}
+
