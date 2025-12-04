@@ -1,0 +1,154 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Réservations - Chef{% endblock %}
+
+{% block stylesheets %}
+  {{ encore_entry_link_tags('chef-reservations') }}
+{% endblock %}
+
+{% block body %}
+<div class="chef-reservations-wrapper">
+  {# Navigation de date #}
+  <div class="reservations-header">
+    <div class="date-navigation">
+      {% if date|date('Y-m-d') == today|date('Y-m-d') %}
+        <span class="nav-arrow disabled">
+          <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </span>
+      {% else %}
+        <a href="{{ path('chef_reservations_date', {date: date|date_modify('-1 day')|date('Y-m-d')}) }}" class="nav-arrow">
+          <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </a>
+      {% endif %}
+      <div class="date-display">
+        <span class="day-name">{{ date|date('l')|day_fr|capitalize }}</span>
+        <span class="day-number">{{ date|date('d') }}</span>
+        <span class="month-name">{{ date|date('F')|month_fr|capitalize }}</span>
+      </div>
+      <a href="{{ path('chef_reservations_date', {date: date|date_modify('+1 day')|date('Y-m-d')}) }}" class="nav-arrow">
+        <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </a>
+    </div>
+  </div>
+
+  {# Cartes par formule #}
+  <div class="reservations-content">
+    {# Formule Salade #}
+    {% if reservationsByFormule.salade|length > 0 %}
+      <div class="formule-section">
+        <div class="formule-header">
+          <h2>Salade</h2>
+          <span class="formule-count">({{ reservationsByFormule.salade|length }})</span>
+        </div>
+        <div class="reservations-list">
+          {% for reservation in reservationsByFormule.salade %}
+            <div class="reservation-card">
+              <div class="reservation-header">
+                <div class="reservation-user">{{ reservation.user.name }}</div>
+                {% if reservation.lieu %}
+                  <div class="reservation-lieu">{{ reservation.lieu.name }}</div>
+                {% endif %}
+              </div>
+              <div class="reservation-details">
+                {% if reservation.salade %}
+                  <span class="reservation-item">{{ reservation.salade.name }}</span>
+                {% endif %}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    {# Formule Restaurant #}
+    {% if reservationsByFormule.restaurant|length > 0 %}
+      <div class="formule-section">
+        <div class="formule-header">
+          <h2>Restaurant</h2>
+          <span class="formule-count">({{ reservationsByFormule.restaurant|length }})</span>
+        </div>
+        <div class="reservations-list">
+          {% for reservation in reservationsByFormule.restaurant %}
+            <div class="reservation-card">
+              <div class="reservation-header">
+                <div class="reservation-user">{{ reservation.user.name }}</div>
+                {% if reservation.lieu %}
+                  <div class="reservation-lieu">{{ reservation.lieu.name }}</div>
+                {% endif %}
+              </div>
+              <div class="reservation-details">
+                {% if reservation.entree %}
+                  <span class="reservation-item">{{ reservation.entree.name }}</span>
+                {% endif %}
+                {% if reservation.plat %}
+                  <span class="reservation-item">{{ reservation.plat.name }}</span>
+                {% endif %}
+                {% if reservation.accompagnement %}
+                  <span class="reservation-item">{{ reservation.accompagnement.name }}</span>
+                {% endif %}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    {# Formule Mess #}
+    {% if reservationsByFormule.mess|length > 0 %}
+      <div class="formule-section">
+        <div class="formule-header">
+          <h2>Mess</h2>
+          <span class="formule-count">({{ reservationsByFormule.mess|length }})</span>
+        </div>
+        <div class="reservations-list">
+          {% for messRequest in reservationsByFormule.mess %}
+            <div class="reservation-card mess-card">
+              <div class="reservation-user">{{ messRequest.user.name }}</div>
+              <div class="reservation-details mess-details">
+                {% if messRequest.nombreConvives %}
+                  <div class="mess-info"><strong>Nombre de convives:</strong> {{ messRequest.nombreConvives }}</div>
+                {% endif %}
+                <div class="mess-repas">
+                  {% if messRequest.petitDejeuner %}<span class="mess-tag">Petit déjeuner</span>{% endif %}
+                  {% if messRequest.dejeuner %}<span class="mess-tag">Déjeuner</span>{% endif %}
+                  {% if messRequest.pauses %}<span class="mess-tag">Pauses</span>{% endif %}
+                  {% if messRequest.diner %}<span class="mess-tag">Dîner</span>{% endif %}
+                </div>
+                {% if messRequest.commentaires %}
+                  <div class="mess-comment">{{ messRequest.commentaires }}</div>
+                {% endif %}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    {# Message si aucune réservation #}
+    {% if reservationsByFormule.salade|length == 0 and reservationsByFormule.restaurant|length == 0 and reservationsByFormule.mess|length == 0 %}
+      <div class="no-reservations">
+        <p>Aucune réservation pour cette date.</p>
+      </div>
+    {% endif %}
+  </div>
+
+  {# Bouton de téléchargement PDF #}
+  <div class="pdf-download-section">
+    <a href="{{ path('chef_reservations_pdf', {date: date|date('Y-m-d')}) }}" class="btn-download-pdf">
+      <svg class="pdf-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+        <line x1="16" y1="13" x2="8" y2="13"></line>
+        <line x1="16" y1="17" x2="8" y2="17"></line>
+        <polyline points="10 9 9 9 8 9"></polyline>
+      </svg>
+      <span>Télécharger le PDF</span>
+    </a>
+  </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+  {{ encore_entry_script_tags('chef-reservations') }}
+{% endblock %}
+

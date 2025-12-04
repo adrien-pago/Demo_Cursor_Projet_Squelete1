@@ -19,6 +19,7 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 #[IsGranted('ROLE_EMPLOYEE')]
 final class EmployeeController extends AbstractController
@@ -481,6 +482,74 @@ final class EmployeeController extends AbstractController
         }
 
         return $this->render('employee/mess.html.twig');
+    }
+
+    #[Route('/employee/account', name: 'employee_account')]
+    public function account(): Response
+    {
+        $user = $this->getUser();
+        
+        return $this->render('employee/account.html.twig', [
+            'user' => $user,
+            'balance' => $user->getBalanceFloat(),
+        ]);
+    }
+
+    #[Route('/employee/account/credit', name: 'employee_account_credit', methods: ['POST'])]
+    public function creditBalance(Request $request, EntityManagerInterface $em): Response
+    {
+        $user = $this->getUser();
+        $amount = $request->request->get('amount');
+        
+        if (!$amount || !is_numeric($amount) || $amount <= 0) {
+            $this->addFlash('danger', 'Montant invalide.');
+            return $this->redirectToRoute('employee_account');
+        }
+        
+        $currentBalance = (float) $user->getBalance();
+        $newBalance = $currentBalance + (float) $amount;
+        $user->setBalance((string) number_format($newBalance, 2, '.', ''));
+        
+        $em->flush();
+        
+        $this->addFlash('success', 'Solde crédité de ' . number_format((float) $amount, 2, ',', ' ') . ' € avec succès.');
+        
+        return $this->redirectToRoute('employee_account');
+    }
+
+    #[Route('/employee/account/change-password', name: 'employee_account_change_password', methods: ['POST'])]
+    public function changePassword(Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $hasher): Response
+    {
+        $user = $this->getUser();
+        $currentPassword = $request->request->get('current_password');
+        $newPassword = $request->request->get('new_password');
+        $confirmPassword = $request->request->get('confirm_password');
+        
+        // Vérifier le mot de passe actuel
+        if (!$hasher->isPasswordValid($user, $currentPassword)) {
+            $this->addFlash('danger', 'Mot de passe actuel incorrect.');
+            return $this->redirectToRoute('employee_account');
+        }
+        
+        // Vérifier que les nouveaux mots de passe correspondent
+        if ($newPassword !== $confirmPassword) {
+            $this->addFlash('danger', 'Les nouveaux mots de passe ne correspondent pas.');
+            return $this->redirectToRoute('employee_account');
+        }
+        
+        // Vérifier la longueur du nouveau mot de passe
+        if (strlen($newPassword) < 8) {
+            $this->addFlash('danger', 'Le nouveau mot de passe doit contenir au moins 8 caractères.');
+            return $this->redirectToRoute('employee_account');
+        }
+        
+        // Mettre à jour le mot de passe
+        $user->setPassword($hasher->hashPassword($user, $newPassword));
+        $em->flush();
+        
+        $this->addFlash('success', 'Mot de passe modifié avec succès.');
+        
+        return $this->redirectToRoute('employee_account');
     }
 
     private function createStatutIfNotExists(EntityManagerInterface $em, string $name): StatutCommande

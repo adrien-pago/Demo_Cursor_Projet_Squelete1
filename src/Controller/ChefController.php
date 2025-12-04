@@ -926,42 +926,160 @@ final class ChefController extends AbstractController
     }
 
     #[Route('/chef/reservations', name: 'chef_reservations')]
-    public function reservations(ReservationRepository $reservationRepo, Request $request, EntityManagerInterface $em): Response
+    #[Route('/chef/reservations/{date}', name: 'chef_reservations_date', requirements: ['date' => '\d{4}-\d{2}-\d{2}'])]
+    public function reservations(?string $date = null, ReservationRepository $reservationRepo, MessRequestRepository $messRequestRepo, EntityManagerInterface $em): Response
     {
-        $dateFilter = $request->query->get('date');
-        $statutFilter = $request->query->get('statut');
-
-        $qb = $reservationRepo->createQueryBuilder('r')
-            ->orderBy('r.date', 'DESC')
-            ->addOrderBy('r.createdAt', 'DESC');
-
-        if ($dateFilter) {
+        // Si aucune date n'est fournie, utiliser la date du jour
+        if (!$date) {
+            $dateObj = new \DateTime('today');
+        } else {
             try {
-                $dateObj = new \DateTime($dateFilter);
-                $qb->andWhere('r.date = :date')
-                    ->setParameter('date', $dateObj);
+                $dateObj = new \DateTime($date);
             } catch (\Exception $e) {
-                // Ignore invalid date
+                $dateObj = new \DateTime('today');
             }
         }
-
-        if ($statutFilter) {
-            $qb->join('r.statutCommande', 's')
-                ->andWhere('s.name = :statut')
-                ->setParameter('statut', $statutFilter);
+        
+        // Normaliser la date (sans heure)
+        $dateObj->setTime(0, 0, 0);
+        
+        // Date du jour pour désactiver la flèche gauche
+        $today = new \DateTime('today');
+        
+        // Récupérer toutes les réservations pour cette date
+        $reservations = $reservationRepo->findByDate($dateObj);
+        
+        // Récupérer les demandes Mess pour cette date
+        $messRequests = $messRequestRepo->createQueryBuilder('m')
+            ->where('m.date = :date')
+            ->setParameter('date', $dateObj->format('Y-m-d'))
+            ->getQuery()
+            ->getResult();
+        
+        // Organiser les réservations par formule
+        $reservationsByFormule = [
+            'salade' => [],
+            'restaurant' => [],
+            'mess' => []
+        ];
+        
+        $formuleRepo = $em->getRepository(\App\Entity\Formule::class);
+        $formuleRestaurant = $formuleRepo->findOneBy(['name' => 'menu complet']);
+        $formuleSalade = $formuleRepo->findOneBy(['name' => 'salade']);
+        $formuleMess = $formuleRepo->findOneBy(['name' => 'Mess']);
+        
+        $formuleRestaurantId = $formuleRestaurant ? $formuleRestaurant->getId() : null;
+        $formuleSaladeId = $formuleSalade ? $formuleSalade->getId() : null;
+        $formuleMessId = $formuleMess ? $formuleMess->getId() : null;
+        
+        foreach ($reservations as $reservation) {
+            $reservationFormule = $reservation->getFormule();
+            if ($reservationFormule) {
+                $reservationFormuleId = $reservationFormule->getId();
+                if ($reservationFormuleId === $formuleSaladeId) {
+                    $reservationsByFormule['salade'][] = $reservation;
+                } elseif ($reservationFormuleId === $formuleRestaurantId) {
+                    $reservationsByFormule['restaurant'][] = $reservation;
+                }
+            }
+        }
+        
+        // Ajouter les demandes Mess
+        foreach ($messRequests as $messRequest) {
+            $reservationsByFormule['mess'][] = $messRequest;
         }
 
-        $reservations = $qb->getQuery()->getResult();
-
-        $statutRepo = $em->getRepository(\App\Entity\StatutCommande::class);
-        $statuts = $statutRepo->findAll();
-
-        return $this->render('chef/reservations/index.html.twig', [
-            'reservations' => $reservations,
-            'statuts' => $statuts,
-            'dateFilter' => $dateFilter,
-            'statutFilter' => $statutFilter,
+        return $this->render('chef/reservations.html.twig', [
+            'date' => $dateObj,
+            'today' => $today,
+            'reservationsByFormule' => $reservationsByFormule,
         ]);
+    }
+
+    #[Route('/chef/reservations/{date}/pdf', name: 'chef_reservations_pdf', requirements: ['date' => '\d{4}-\d{2}-\d{2}'])]
+    public function reservationsPdf(?string $date = null, ReservationRepository $reservationRepo, MessRequestRepository $messRequestRepo, EntityManagerInterface $em): Response
+    {
+        // Si aucune date n'est fournie, utiliser la date du jour
+        if (!$date) {
+            $dateObj = new \DateTime('today');
+        } else {
+            try {
+                $dateObj = new \DateTime($date);
+            } catch (\Exception $e) {
+                $dateObj = new \DateTime('today');
+            }
+        }
+        
+        // Normaliser la date (sans heure)
+        $dateObj->setTime(0, 0, 0);
+        
+        // Récupérer toutes les réservations pour cette date
+        $reservations = $reservationRepo->findByDate($dateObj);
+        
+        // Récupérer les demandes Mess pour cette date
+        $messRequests = $messRequestRepo->createQueryBuilder('m')
+            ->where('m.date = :date')
+            ->setParameter('date', $dateObj->format('Y-m-d'))
+            ->getQuery()
+            ->getResult();
+        
+        // Organiser les réservations par formule
+        $reservationsByFormule = [
+            'salade' => [],
+            'restaurant' => [],
+            'mess' => []
+        ];
+        
+        $formuleRepo = $em->getRepository(\App\Entity\Formule::class);
+        $formuleRestaurant = $formuleRepo->findOneBy(['name' => 'menu complet']);
+        $formuleSalade = $formuleRepo->findOneBy(['name' => 'salade']);
+        $formuleMess = $formuleRepo->findOneBy(['name' => 'Mess']);
+        
+        $formuleRestaurantId = $formuleRestaurant ? $formuleRestaurant->getId() : null;
+        $formuleSaladeId = $formuleSalade ? $formuleSalade->getId() : null;
+        $formuleMessId = $formuleMess ? $formuleMess->getId() : null;
+        
+        foreach ($reservations as $reservation) {
+            $reservationFormule = $reservation->getFormule();
+            if ($reservationFormule) {
+                $reservationFormuleId = $reservationFormule->getId();
+                if ($reservationFormuleId === $formuleSaladeId) {
+                    $reservationsByFormule['salade'][] = $reservation;
+                } elseif ($reservationFormuleId === $formuleRestaurantId) {
+                    $reservationsByFormule['restaurant'][] = $reservation;
+                }
+            }
+        }
+        
+        // Ajouter les demandes Mess
+        foreach ($messRequests as $messRequest) {
+            $reservationsByFormule['mess'][] = $messRequest;
+        }
+
+        // Générer le HTML pour le PDF
+        $html = $this->renderView('chef/reservations-pdf.html.twig', [
+            'date' => $dateObj,
+            'reservationsByFormule' => $reservationsByFormule,
+        ]);
+
+        // Créer le PDF avec DomPDF
+        $dompdf = new \Dompdf\Dompdf();
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        // Générer le nom du fichier
+        $filename = 'reservations_' . $dateObj->format('Y-m-d') . '.pdf';
+
+        // Retourner le PDF en téléchargement
+        return new Response(
+            $dompdf->output(),
+            200,
+            [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            ]
+        );
     }
 
     #[Route('/chef/reservation/{id}', name: 'chef_reservation_details')]
@@ -1010,19 +1128,88 @@ final class ChefController extends AbstractController
     {
         $lieuRepo = $em->getRepository(\App\Entity\Lieu::class);
         $formuleRepo = $em->getRepository(\App\Entity\Formule::class);
+        $reservationRepo = $em->getRepository(\App\Entity\Reservation::class);
+        $compositionLieuRepo = $em->getRepository(\App\Entity\CompositionLieu::class);
+        $compositionFormuleRepo = $em->getRepository(\App\Entity\CompositionFormule::class);
 
         if ($request->isMethod('POST')) {
+            // Gérer la suppression des lieux
+            $deleteLieuIds = $request->request->get('delete_lieu_ids');
+            if ($deleteLieuIds) {
+                $ids = explode(',', $deleteLieuIds);
+                foreach ($ids as $id) {
+                    $id = trim($id);
+                    if (empty($id)) continue;
+                    
+                    $lieu = $lieuRepo->find($id);
+                    if ($lieu) {
+                        // Vérifier l'utilisation
+                        $reservations = $reservationRepo->findBy(['lieu' => $lieu]);
+                        $compositions = $compositionLieuRepo->findBy(['lieu' => $lieu]);
+                        
+                        if (count($reservations) > 0 || count($compositions) > 0) {
+                            $this->addFlash('warning', "Le lieu \"{$lieu->getName()}\" est utilisé et ne peut pas être supprimé.");
+                            continue;
+                        }
+                        
+                        $em->remove($lieu);
+                    }
+                }
+            }
+
+            // Gérer la suppression des formules
+            $deleteFormuleIds = $request->request->get('delete_formule_ids');
+            if ($deleteFormuleIds) {
+                $ids = explode(',', $deleteFormuleIds);
+                foreach ($ids as $id) {
+                    $id = trim($id);
+                    if (empty($id)) continue;
+                    
+                    $formule = $formuleRepo->find($id);
+                    if ($formule) {
+                        // Vérifier l'utilisation
+                        $reservations = $reservationRepo->findBy(['formule' => $formule]);
+                        $compositions = $compositionFormuleRepo->findBy(['formule' => $formule]);
+                        
+                        if (count($reservations) > 0 || count($compositions) > 0) {
+                            $this->addFlash('warning', "La formule \"{$formule->getName()}\" est utilisée et ne peut pas être supprimée.");
+                            continue;
+                        }
+                        
+                        $em->remove($formule);
+                    }
+                }
+            }
+
             // Gérer la création/modification des lieux
             $lieuNames = $request->request->all('lieu_names') ?? [];
             $lieuIds = $request->request->all('lieu_ids') ?? [];
 
             foreach ($lieuNames as $index => $name) {
                 if (empty($name)) continue;
+                
+                $id = $lieuIds[$index] ?? null;
+                
+                // Ignorer les items marqués pour suppression
+                if ($deleteLieuIds && in_array($id, explode(',', $deleteLieuIds))) {
+                    continue;
+                }
 
-                if (isset($lieuIds[$index]) && $lieuIds[$index]) {
-                    $lieu = $lieuRepo->find($lieuIds[$index]);
+                if ($id) {
+                    $lieu = $lieuRepo->find($id);
                     if ($lieu) {
-                        $lieu->setName($name);
+                        $oldName = $lieu->getName();
+                        if ($oldName !== $name) {
+                            // Vérifier l'utilisation avant modification
+                            $reservations = $reservationRepo->findBy(['lieu' => $lieu]);
+                            $compositions = $compositionLieuRepo->findBy(['lieu' => $lieu]);
+                            
+                            if (count($reservations) > 0 || count($compositions) > 0) {
+                                $this->addFlash('warning', "Le lieu \"{$oldName}\" est utilisé. Le nom a été modifié mais cela peut affecter les données existantes.");
+                            }
+                            
+                            $lieu->setName($name);
+                        }
                     }
                 } else {
                     $lieu = new \App\Entity\Lieu();
@@ -1037,11 +1224,29 @@ final class ChefController extends AbstractController
 
             foreach ($formuleNames as $index => $name) {
                 if (empty($name)) continue;
+                
+                $id = $formuleIds[$index] ?? null;
+                
+                // Ignorer les items marqués pour suppression
+                if ($deleteFormuleIds && in_array($id, explode(',', $deleteFormuleIds))) {
+                    continue;
+                }
 
-                if (isset($formuleIds[$index]) && $formuleIds[$index]) {
-                    $formule = $formuleRepo->find($formuleIds[$index]);
+                if ($id) {
+                    $formule = $formuleRepo->find($id);
                     if ($formule) {
-                        $formule->setName($name);
+                        $oldName = $formule->getName();
+                        if ($oldName !== $name) {
+                            // Vérifier l'utilisation avant modification
+                            $reservations = $reservationRepo->findBy(['formule' => $formule]);
+                            $compositions = $compositionFormuleRepo->findBy(['formule' => $formule]);
+                            
+                            if (count($reservations) > 0 || count($compositions) > 0) {
+                                $this->addFlash('warning', "La formule \"{$oldName}\" est utilisée. Le nom a été modifié mais cela peut affecter les données existantes.");
+                            }
+                            
+                            $formule->setName($name);
+                        }
                     }
                 } else {
                     $formule = new \App\Entity\Formule();
@@ -1058,6 +1263,54 @@ final class ChefController extends AbstractController
         return $this->render('chef/settings.html.twig', [
             'lieus' => $lieuRepo->findAll(),
             'formules' => $formuleRepo->findAll(),
+        ]);
+    }
+
+    #[Route('/chef/settings/check-usage/{type}/{id}', name: 'chef_settings_check_usage', methods: ['GET'])]
+    public function checkUsage(string $type, int $id, EntityManagerInterface $em): Response
+    {
+        $reservationRepo = $em->getRepository(\App\Entity\Reservation::class);
+        $compositionLieuRepo = $em->getRepository(\App\Entity\CompositionLieu::class);
+        $compositionFormuleRepo = $em->getRepository(\App\Entity\CompositionFormule::class);
+        
+        $isUsed = false;
+        $message = '';
+        
+        if ($type === 'lieu') {
+            $lieuRepo = $em->getRepository(\App\Entity\Lieu::class);
+            $lieu = $lieuRepo->find($id);
+            
+            if ($lieu) {
+                $reservations = $reservationRepo->findBy(['lieu' => $lieu]);
+                $compositions = $compositionLieuRepo->findBy(['lieu' => $lieu]);
+                
+                if (count($reservations) > 0 || count($compositions) > 0) {
+                    $isUsed = true;
+                    $reservationCount = count($reservations);
+                    $compositionCount = count($compositions);
+                    $message = "Ce lieu est utilisé dans {$reservationCount} réservation(s) et {$compositionCount} configuration(s) de menu. La suppression n'est pas recommandée.";
+                }
+            }
+        } elseif ($type === 'formule') {
+            $formuleRepo = $em->getRepository(\App\Entity\Formule::class);
+            $formule = $formuleRepo->find($id);
+            
+            if ($formule) {
+                $reservations = $reservationRepo->findBy(['formule' => $formule]);
+                $compositions = $compositionFormuleRepo->findBy(['formule' => $formule]);
+                
+                if (count($reservations) > 0 || count($compositions) > 0) {
+                    $isUsed = true;
+                    $reservationCount = count($reservations);
+                    $compositionCount = count($compositions);
+                    $message = "Cette formule est utilisée dans {$reservationCount} réservation(s) et {$compositionCount} configuration(s) de menu. La suppression n'est pas recommandée.";
+                }
+            }
+        }
+        
+        return $this->json([
+            'isUsed' => $isUsed,
+            'message' => $message,
         ]);
     }
 }

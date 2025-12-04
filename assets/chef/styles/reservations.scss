@@ -1,0 +1,357 @@
+@import "../../shared/styles/base.scss";
+
+.chef-reservations-wrapper {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding-bottom: 2rem;
+  width: 100%;
+}
+
+// Header avec navigation de date
+.reservations-header {
+  background: white;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+.date-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0 1rem;
+  
+  .nav-arrow {
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    background: transparent !important;
+    border: none !important;
+    width: auto;
+    height: auto;
+    text-decoration: none;
+    box-shadow: none !important;
+    min-width: 0;
+    min-height: 0;
+
+    &:hover:not(.disabled) {
+      transform: scale(1.1);
+      opacity: 0.8;
+    }
+    
+    &.disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .arrow-icon {
+      width: 24px;
+      height: 24px;
+      display: block;
+      object-fit: contain;
+      color: #333;
+    }
+  }
+
+  .date-display {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 0.5rem;
+    
+    .day-name {
+      font-size: 1rem;
+      color: #666;
+      text-transform: capitalize;
+      white-space: nowrap;
+      line-height: 1.2;
+    }
+    
+    .day-number {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #333;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+    
+    .month-name {
+      font-size: 1rem;
+      color: #666;
+      text-transform: capitalize;
+      white-space: nowrap;
+      line-height: 1.2;
+    }
+  }
+}
+
+// Contenu des réservations
+.reservations-content {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0 1rem;
+  
+  @media (min-width: 768px) {
+    padding: 0 2rem;
+  }
+  
+  @media (min-width: 1200px) {
+    padding: 0 3rem;
+  }
+}
+
+// Section par formule
+.formule-section {
+  margin-bottom: 2rem;
+  
+  .formule-header {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.85) 0%, rgba(5, 150, 105, 0.9) 50%, rgba(52, 211, 153, 0.8) 100%);
+    padding: 1rem 1.5rem;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    
+    h2 {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: white;
+      text-transform: capitalize;
+    }
+    
+    .formule-count {
+      font-size: 1rem;
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: 500;
+    }
+  }
+  
+  .reservations-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
+// Carte de réservation
+.reservation-card {
+  background: white;
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+  
+  .reservation-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    gap: 1rem;
+  }
+  
+  .reservation-user {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  
+  .reservation-lieu {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--brand-primary);
+    white-space: nowrap;
+  }
+  
+  .reservation-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    
+    .reservation-item {
+      background: var(--bg-secondary);
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+    }
+  }
+  
+  // Style spécial pour Mess
+  &.mess-card {
+    .mess-details {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+      
+      .mess-info {
+        font-size: 0.95rem;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+        
+        strong {
+          color: var(--text-primary);
+          font-weight: 600;
+        }
+      }
+      
+      .mess-repas {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        
+        .mess-tag {
+          background: var(--brand-gradient);
+          color: white;
+          padding: 0.4rem 0.8rem;
+          border-radius: var(--radius-sm);
+          font-size: 0.85rem;
+          font-weight: 500;
+        }
+      }
+      
+      .mess-comment {
+        background: var(--bg-secondary);
+        padding: 0.75rem 1rem;
+        border-radius: var(--radius-sm);
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        border-left: 3px solid var(--brand-primary);
+        width: 100%;
+        line-height: 1.5;
+      }
+    }
+  }
+}
+
+// Message si aucune réservation
+.no-reservations {
+  text-align: center;
+  padding: 3rem 1rem;
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  
+  p {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+}
+
+// Section de téléchargement PDF
+.pdf-download-section {
+  max-width: 1200px;
+  margin: 2rem auto 0;
+  padding: 0 1rem;
+  display: flex;
+  justify-content: center;
+  
+  @media (min-width: 768px) {
+    padding: 0 2rem;
+  }
+  
+  @media (min-width: 1200px) {
+    padding: 0 3rem;
+  }
+  
+  .btn-download-pdf {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 2rem;
+    background: var(--brand-gradient);
+    color: white;
+    text-decoration: none;
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    font-size: 1rem;
+    box-shadow: var(--shadow-brand);
+    transition: all 0.3s ease;
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.4), 0 4px 6px -2px rgba(16, 185, 129, 0.3);
+    }
+    
+    &:active {
+      transform: translateY(0);
+    }
+    
+    .pdf-icon {
+      width: 20px;
+      height: 20px;
+      stroke-width: 2.5;
+    }
+    
+    span {
+      white-space: nowrap;
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 767px) {
+  .reservations-header {
+    padding: 0.75rem 1rem;
+  }
+  
+  .date-navigation {
+    padding: 0 0.5rem;
+  }
+  
+  .reservations-content {
+    padding: 0 1rem;
+  }
+  
+  .formule-section {
+    margin-bottom: 1.5rem;
+    
+    .formule-header {
+      padding: 0.875rem 1.25rem;
+      
+      h2 {
+        font-size: 1.1rem;
+      }
+      
+      .formule-count {
+        font-size: 0.9rem;
+      }
+    }
+  }
+  
+  .reservation-card {
+    padding: 1rem;
+    
+    .reservation-user {
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .reservation-details {
+      .reservation-item {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.8rem;
+      }
+    }
+  }
+}
+

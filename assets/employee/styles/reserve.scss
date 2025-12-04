@@ -4,6 +4,10 @@
   min-height: 100vh;
   background: #f5f5f5;
   padding-bottom: 100px; // Espace pour le footer fixe
+  
+  @media (max-width: 767px) {
+    padding-bottom: 180px; // Plus d'espace sur mobile pour permettre de scroller jusqu'en bas
+  }
 }
 
 // Header avec navigation de date
@@ -52,27 +56,32 @@
 
   .date-display {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.25rem;
+    flex-direction: row; // Sur la même ligne
+    align-items: baseline; // Aligner sur la ligne de base pour que tous les éléments soient à la même hauteur
+    gap: 0.5rem; // Espace entre les éléments
     
     .day-name {
-      font-size: 0.875rem;
+      font-size: 1rem; // Augmenté
       color: #666;
       text-transform: capitalize;
+      white-space: nowrap;
+      line-height: 1.2; // Même hauteur de ligne pour tous
     }
     
     .day-number {
-      font-size: 1.5rem;
+      font-size: 1.75rem; // Augmenté
       font-weight: 700;
       color: #333;
-      line-height: 1;
+      line-height: 1.2; // Même hauteur de ligne pour tous
+      white-space: nowrap;
     }
     
     .month-name {
-      font-size: 0.875rem;
+      font-size: 1rem; // Augmenté
       color: #666;
       text-transform: capitalize;
+      white-space: nowrap;
+      line-height: 1.2; // Même hauteur de ligne pour tous
     }
   }
 }
@@ -520,6 +529,58 @@
   }
 }
 
+// Message d'information
+.info-message {
+  position: fixed;
+  bottom: 120px; // Au-dessus du footer
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--brand-primary);
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  z-index: 1001;
+  font-weight: 500;
+  font-size: 0.95rem;
+  text-align: center;
+  max-width: 90%;
+  animation: slideUp 0.3s ease;
+  white-space: nowrap;
+  
+  @media (max-width: 767px) {
+    bottom: 110px; // Ajusté pour le footer réduit
+    font-size: 0.875rem;
+    padding: 0.875rem 1.25rem;
+  }
+  
+  &.fade-out {
+    animation: fadeOut 0.3s ease forwards;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px);
+  }
+}
+
 // Footer fixe
 .reserve-footer {
   position: fixed;
@@ -530,69 +591,199 @@
   padding: 1rem;
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
   display: flex;
-  align-items: center;
+  align-items: stretch; // Permet au bouton Annuler de s'étirer à la même hauteur que le cadre Valider
   justify-content: space-between;
+  gap: 1rem;
   z-index: 1000;
   max-width: 1200px;
   margin: 0 auto;
   
+  @media (max-width: 767px) {
+    align-items: center; // Sur mobile, on centre verticalement
+    padding: 0.75rem; // Réduire le padding sur mobile
+    gap: 0.75rem; // Réduire l'espace entre les éléments
+  }
+  
   .cancel-btn {
-    width: 60px;
-    height: 60px;
-    border-radius: 0 !important;
-    border: none !important;
+    min-width: 140px;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 1rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
     transition: all 0.3s ease;
+    box-shadow: var(--shadow-md);
     text-decoration: none;
-    box-shadow: none !important;
-    background: transparent !important;
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
     
-    &:hover {
-      transform: scale(1.1);
-      opacity: 0.8;
+    // Sur desktop, même hauteur que le cadre Valider
+    @media (min-width: 768px) {
+      height: auto;
+      min-height: 100%;
+      align-self: stretch;
     }
     
-    .footer-icon {
-      width: 60px;
-      height: 60px;
-      object-fit: contain;
+    // Sur mobile, hauteur fixe
+    @media (max-width: 767px) {
+      height: 50px;
+    }
+    
+    .btn-text {
+      color: inherit;
+    }
+    
+    &:hover {
+      background: #e2e8f0;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
     }
   }
   
-  .lieux-icons {
+  // Cadre Valider avec lieux
+  .validate-container {
+    flex: 1;
     display: flex;
-    gap: 1rem;
-    align-items: center;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: var(--bg-card);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    min-width: 0; // Permet au flex de rétrécir si nécessaire
     
-    .lieu-icon-wrapper {
-      width: 50px;
-      height: 50px;
+    @media (max-width: 767px) {
+      padding: 0.5rem 0.75rem; // Réduire le padding sur mobile
+      gap: 0.5rem; // Réduire l'espace entre les éléments
+    }
+    
+    .validate-label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.25rem;
+      
+      @media (max-width: 767px) {
+        font-size: 0.75rem; // Réduire la taille du texte sur mobile
+        margin-bottom: 0.15rem; // Réduire la marge
+      }
+    }
+    
+    .lieux-container {
       display: flex;
-      align-items: center;
+      gap: 1rem;
+      align-items: flex-start;
       justify-content: center;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      border-radius: 50%;
-      opacity: 0.5;
+      flex-wrap: wrap;
       
-      &.active {
-        opacity: 1;
-        background: #10b981;
-        transform: scale(1.1);
+      @media (max-width: 767px) {
+        gap: 0.5rem; // Réduire l'espace entre les lieux sur mobile
       }
       
-      &:hover {
-        opacity: 0.8;
-        transform: scale(1.05);
-      }
-      
-      .lieu-icon {
-        width: 40px;
-        height: 40px;
-        object-fit: contain;
+      .lieu-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        padding: 0.5rem;
+        border-radius: var(--radius-md);
+        min-width: 70px;
+        flex-shrink: 0;
+        position: relative;
+        user-select: none;
+        
+        @media (max-width: 767px) {
+          padding: 0.25rem; // Réduire le padding sur mobile
+          gap: 0.25rem; // Réduire l'espace entre l'icône et le label
+          min-width: 60px; // Réduire la largeur minimale
+        }
+        
+        // S'assurer que tous les éléments sont cliquables
+        * {
+          pointer-events: none; // Désactiver les pointer-events sur les enfants pour que le clic soit sur le parent
+        }
+        
+        &:hover {
+          background: var(--bg-secondary);
+          transform: translateY(-2px);
+        }
+        
+        &.active {
+          background: rgba(16, 185, 129, 0.15);
+          
+          .lieu-icon-wrapper {
+            background: var(--brand-primary);
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+          }
+          
+          .lieu-label {
+            color: var(--brand-primary);
+            font-weight: 600;
+          }
+        }
+        
+        .lieu-icon-wrapper {
+          width: 50px;
+          height: 50px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: var(--bg-secondary);
+          border-radius: 50%;
+          transition: all 0.3s ease;
+          
+          @media (max-width: 767px) {
+            width: 40px; // Réduire la taille des cercles sur mobile
+            height: 40px;
+          }
+          
+          .lieu-icon {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+            // Pas de filtre pour laisser les icônes s'afficher normalement avec leurs couleurs
+            display: block;
+            
+            @media (max-width: 767px) {
+              width: 26px; // Réduire la taille des icônes sur mobile
+              height: 26px;
+            }
+          }
+        }
+        
+        &.active .lieu-icon-wrapper {
+          .lieu-icon {
+            // Les icônes gardent leurs couleurs naturelles même quand actives
+            // On peut ajouter un léger filtre pour les rendre blanches si nécessaire
+            filter: brightness(0) invert(1); // Blanc sur fond vert
+          }
+        }
+        
+        &:hover .lieu-icon-wrapper .lieu-icon {
+          transform: scale(1.05);
+        }
+        
+        .lieu-label {
+          font-size: 0.75rem;
+          color: var(--text-secondary);
+          text-align: center;
+          transition: all 0.3s ease;
+          line-height: 1.2;
+          white-space: nowrap;
+          
+          @media (max-width: 767px) {
+            font-size: 0.65rem; // Réduire la taille du texte sur mobile
+          }
+        }
       }
     }
   }
@@ -651,17 +842,39 @@
   
   .reserve-footer {
     padding: 0.75rem;
+    flex-direction: column;
+    gap: 0.75rem;
     
-    .lieux-icons {
-      gap: 0.75rem;
+    .cancel-btn {
+      width: 100%;
+      min-width: auto;
+    }
+    
+    .validate-container {
+      width: 100%;
       
-      .lieu-icon-wrapper {
-        width: 45px;
-        height: 45px;
+      .lieux-container {
+        gap: 0.75rem;
+        justify-content: space-around;
         
-        .lieu-icon {
-          width: 35px;
-          height: 35px;
+        .lieu-item {
+          min-width: 60px;
+          flex: 1;
+          max-width: 100px;
+          
+          .lieu-icon-wrapper {
+            width: 45px;
+            height: 45px;
+            
+            .lieu-icon {
+              width: 28px;
+              height: 28px;
+            }
+          }
+          
+          .lieu-label {
+            font-size: 0.7rem;
+          }
         }
       }
     }

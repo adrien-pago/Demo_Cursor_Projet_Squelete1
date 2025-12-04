@@ -34,10 +34,22 @@ class ReservationRepository extends ServiceEntityRepository
         // Pour SQLite, utiliser le format string Y-m-d directement
         $dateString = $dateNormalized->format('Y-m-d');
         
-        // Charger les formules avec un join pour éviter le lazy loading
+        // Charger les formules et lieux avec des joins pour éviter le lazy loading
         return $this->createQueryBuilder('r')
             ->leftJoin('r.formule', 'f')
             ->addSelect('f')
+            ->leftJoin('r.lieu', 'l')
+            ->addSelect('l')
+            ->leftJoin('r.user', 'u')
+            ->addSelect('u')
+            ->leftJoin('r.salade', 's')
+            ->addSelect('s')
+            ->leftJoin('r.entree', 'e')
+            ->addSelect('e')
+            ->leftJoin('r.plat', 'p')
+            ->addSelect('p')
+            ->leftJoin('r.accompagnement', 'a')
+            ->addSelect('a')
             ->where('r.date = :date')
             ->setParameter('date', $dateString)
             ->orderBy('r.createdAt', 'ASC')

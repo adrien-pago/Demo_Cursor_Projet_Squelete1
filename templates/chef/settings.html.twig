@@ -2,88 +2,128 @@
 
 {% block title %}Paramètres{% endblock %}
 
-{% block stylesheets %}{{ encore_entry_link_tags('chef-agenda') }}{% endblock %}
+{% block stylesheets %}
+  {{ encore_entry_link_tags('chef-settings') }}
+{% endblock %}
 
 {% block body %}
+<div class="chef-settings-wrapper">
+  <div class="settings-header">
+    <h1>Paramètres d'administration</h1>
+  </div>
 
-<div class="container">
-  <h1 class="mb-4">Paramètres d'administration</h1>
+  {# Messages flash #}
+  {% for label, messages in app.flashes %}
+    {% for message in messages %}
+      <div class="alert alert-{{ label }}" role="alert">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endfor %}
 
-  <form method="post">
-    <div class="row">
-      <div class="col-md-6">
-        <div class="card mb-4">
-          <div class="card-header">
-            <h5>Modes de livraison (Lieux)</h5>
-          </div>
-          <div class="card-body">
-            <div id="lieus-container">
-              {% for lieu in lieus %}
-                <div class="mb-2 d-flex gap-2">
-                  <input type="hidden" name="lieu_ids[]" value="{{ lieu.id }}">
-                  <input type="text" name="lieu_names[]" value="{{ lieu.name }}" class="form-control" required>
+  <form method="post" id="settings-form">
+    <div class="settings-content">
+      {# Section Modes de livraison #}
+      <div class="settings-section">
+        <div class="section-header">
+          <h2>Modes de livraison (Lieux)</h2>
+        </div>
+        <div class="section-content">
+          <div id="lieus-container" class="items-container">
+            {% for lieu in lieus %}
+              <div class="item-row" data-id="{{ lieu.id }}" data-type="lieu">
+                <input type="hidden" name="lieu_ids[]" value="{{ lieu.id }}">
+                <input type="text" name="lieu_names[]" value="{{ lieu.name }}" class="item-input" required>
+                <div class="item-actions">
+                  <button type="button" class="btn-item-delete" data-id="{{ lieu.id }}" data-type="lieu" data-name="{{ lieu.name }}" title="Supprimer">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                    </svg>
+                  </button>
                 </div>
-              {% endfor %}
-            </div>
-            <button type="button" class="btn btn-sm btn-outline-primary mt-2" id="add-lieu">+ Ajouter un lieu</button>
+              </div>
+            {% endfor %}
           </div>
+          <button type="button" class="btn-add-item" id="add-lieu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Ajouter un lieu
+          </button>
         </div>
       </div>
 
-      <div class="col-md-6">
-        <div class="card mb-4">
-          <div class="card-header">
-            <h5>Formules</h5>
-          </div>
-          <div class="card-body">
-            <div id="formules-container">
-              {% for formule in formules %}
-                <div class="mb-2 d-flex gap-2">
-                  <input type="hidden" name="formule_ids[]" value="{{ formule.id }}">
-                  <input type="text" name="formule_names[]" value="{{ formule.name }}" class="form-control" required>
+      {# Section Formules #}
+      <div class="settings-section">
+        <div class="section-header">
+          <h2>Formules</h2>
+        </div>
+        <div class="section-content">
+          <div id="formules-container" class="items-container">
+            {% for formule in formules %}
+              <div class="item-row" data-id="{{ formule.id }}" data-type="formule">
+                <input type="hidden" name="formule_ids[]" value="{{ formule.id }}">
+                <input type="text" name="formule_names[]" value="{{ formule.name }}" class="item-input" required>
+                <div class="item-actions">
+                  <button type="button" class="btn-item-delete" data-id="{{ formule.id }}" data-type="formule" data-name="{{ formule.name }}" title="Supprimer">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                    </svg>
+                  </button>
                 </div>
-              {% endfor %}
-            </div>
-            <button type="button" class="btn btn-sm btn-outline-primary mt-2" id="add-formule">+ Ajouter une formule</button>
+              </div>
+            {% endfor %}
           </div>
+          <button type="button" class="btn-add-item" id="add-formule">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Ajouter une formule
+          </button>
         </div>
       </div>
     </div>
 
-    <div class="row">
-      <div class="col-12">
-        <button type="submit" class="btn btn-success">Enregistrer</button>
-        <a href="{{ path('chef_agenda') }}" class="btn btn-outline-secondary">Retour</a>
-      </div>
+    {# Champ caché pour les IDs à supprimer #}
+    <input type="hidden" name="delete_lieu_ids" id="delete-lieu-ids" value="">
+    <input type="hidden" name="delete_formule_ids" id="delete-formule-ids" value="">
+
+    <div class="settings-footer">
+      <button type="submit" class="btn-save">Enregistrer</button>
+      <a href="{{ path('chef_agenda') }}" class="btn-cancel">Retour</a>
     </div>
   </form>
 </div>
 
+{# Modal de confirmation de suppression #}
+<div id="delete-modal" class="modal-overlay" style="display: none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Confirmer la suppression</h3>
+      <button type="button" class="modal-close" id="close-delete-modal">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p id="delete-message"></p>
+      <div id="delete-warning" class="delete-warning" style="display: none;">
+        <strong>⚠️ Attention :</strong>
+        <p id="delete-warning-text"></p>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="btn-modal-cancel" id="cancel-delete">Annuler</button>
+      <button type="button" class="btn-modal-confirm" id="confirm-delete">Supprimer</button>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 {% block javascripts %}
-<script>
-document.getElementById('add-lieu')?.addEventListener('click', function() {
-  const container = document.getElementById('lieus-container');
-  const div = document.createElement('div');
-  div.className = 'mb-2 d-flex gap-2';
-  div.innerHTML = `
-    <input type="hidden" name="lieu_ids[]" value="">
-    <input type="text" name="lieu_names[]" class="form-control" required>
-  `;
-  container.appendChild(div);
-});
-
-document.getElementById('add-formule')?.addEventListener('click', function() {
-  const container = document.getElementById('formules-container');
-  const div = document.createElement('div');
-  div.className = 'mb-2 d-flex gap-2';
-  div.innerHTML = `
-    <input type="hidden" name="formule_ids[]" value="">
-    <input type="text" name="formule_names[]" class="form-control" required>
-  `;
-  container.appendChild(div);
-});
-</script>
+  {{ encore_entry_script_tags('chef-settings') }}
 {% endblock %}
-

@@ -244,30 +244,36 @@
     {% if not hasReservation %}
       {# Afficher les boutons normaux si on n'est pas dans la section Mess #}
       <a href="{{ path('employee_dashboard') }}" class="footer-btn cancel-btn" id="footer-cancel-btn">
-        <img src="{{ asset('icons/cross-icon.png') }}" alt="Annuler" class="footer-icon">
+        <span class="btn-text">Annuler</span>
       </a>
       
-      <div class="lieux-icons" id="lieux-icons">
-      {% for lieu in lieusActifs %}
-        {% set lieuNameLower = lieu.name|lower %}
-        <div class="lieu-icon-wrapper" data-lieu-id="{{ lieu.id }}">
-          {% if lieuNameLower == 'restaurant' or lieuNameLower == 'sur place' %}
-            <img src="{{ asset('icons/chef-hat.png') }}" alt="Sur place" class="lieu-icon" title="Sur place">
-          {% elseif lieuNameLower|contains('emporter') or lieuNameLower|contains('à emporter') %}
-            <img src="{{ asset('icons/shopping-bag.png') }}" alt="À emporter" class="lieu-icon" title="À emporter">
-          {% elseif lieuNameLower|contains('livraison') or lieuNameLower|contains('bureau') or lieuNameLower|contains('delivery') %}
-            <img src="{{ asset('icons/Idelivery-truck.png') }}" alt="Livraison" class="lieu-icon" title="Livraison">
-          {% endif %}
+      {# Cadre Valider avec lieux #}
+      <div class="validate-container" id="validate-container">
+        <div class="validate-label">Valider</div>
+        <div class="lieux-container" id="lieux-container">
+          {% for lieu in lieusActifs %}
+            {% set lieuNameLower = lieu.name|lower %}
+            <div class="lieu-item" data-lieu-id="{{ lieu.id }}">
+              <div class="lieu-icon-wrapper">
+                {% if lieuNameLower == 'restaurant' or lieuNameLower == 'sur place' %}
+                  <img src="{{ asset('icons/chef-hat.png') }}" alt="Sur place" class="lieu-icon">
+                {% elseif lieuNameLower|contains('emporter') or lieuNameLower|contains('à emporter') %}
+                  <img src="{{ asset('icons/shopping-bag.png') }}" alt="À emporter" class="lieu-icon">
+                {% elseif lieuNameLower|contains('livraison') or lieuNameLower|contains('bureau') or lieuNameLower|contains('delivery') %}
+                  <img src="{{ asset('icons/Idelivery-truck.png') }}" alt="Livraison" class="lieu-icon">
+                {% endif %}
+              </div>
+              <span class="lieu-label">{{ lieu.name }}</span>
+            </div>
+          {% endfor %}
         </div>
-      {% endfor %}
       </div>
-      <button type="submit" class="btn btn-primary validate-btn" form="reservation-form" id="footer-validate-btn">Valider</button>
     {% endif %}
     
     {# Boutons pour la section Mess (cachés par défaut) #}
     <div class="mess-footer-buttons" id="mess-footer-buttons" style="display: none;">
       <a href="{{ path('employee_dashboard') }}" class="footer-btn cancel-btn">
-        <img src="{{ asset('icons/cross-icon.png') }}" alt="Annuler" class="footer-icon">
+        <span class="btn-text">Annuler</span>
       </a>
       <button type="submit" form="mess-form" class="mess-submit-btn-footer">Envoyer le message</button>
     </div>
@@ -275,6 +281,7 @@
 
   {# Formulaire caché pour la soumission #}
   <form method="post" action="{{ path('employee_reserve_post') }}" id="reservation-form" style="display: none;">
+    <input type="hidden" name="_token" value="{{ csrf_token('reservation') }}">
     <input type="hidden" name="date" value="{{ date|date('Y-m-d') }}">
     <input type="hidden" name="formule" id="form-formule" value="">
     <input type="hidden" name="lieu" id="form-lieu" value="">

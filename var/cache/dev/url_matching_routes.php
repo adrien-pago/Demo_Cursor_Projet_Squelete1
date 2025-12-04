@@ -23,6 +23,9 @@ return [
         '/employee/reserve' => [[['_route' => 'employee_reserve_post', '_controller' => 'App\\Controller\\EmployeeController::reservePost'], null, ['POST' => 0], null, false, false, null]],
         '/employee/reservations' => [[['_route' => 'employee_reservations', '_controller' => 'App\\Controller\\EmployeeController::reservations'], null, null, null, false, false, null]],
         '/employee/mess' => [[['_route' => 'employee_mess', '_controller' => 'App\\Controller\\EmployeeController::mess'], null, ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        '/employee/account' => [[['_route' => 'employee_account', '_controller' => 'App\\Controller\\EmployeeController::account'], null, null, null, false, false, null]],
+        '/employee/account/credit' => [[['_route' => 'employee_account_credit', '_controller' => 'App\\Controller\\EmployeeController::creditBalance'], null, ['POST' => 0], null, false, false, null]],
+        '/employee/account/change-password' => [[['_route' => 'employee_account_change_password', '_controller' => 'App\\Controller\\EmployeeController::changePassword'], null, ['POST' => 0], null, false, false, null]],
         '/' => [[['_route' => 'app_home', '_controller' => 'App\\Controller\\HomeController'], null, ['GET' => 0], null, false, false, null]],
         '/register' => [[['_route' => 'app_register', '_controller' => 'App\\Controller\\RegistrationController'], null, ['GET' => 0, 'POST' => 1], null, false, false, null]],
         '/login' => [[['_route' => 'app_login', '_controller' => 'App\\Controller\\SecurityController::login'], null, null, null, false, false, null]],
@@ -38,37 +41,46 @@ return [
                         .')'
                         .'|als/([^/]++)(*:80)'
                     .')'
-                    .'|salades/(?'
-                        .'|([^/]++)(*:107)'
-                        .'|new(*:118)'
-                        .'|([^/]++)/(?'
-                            .'|edit(*:142)'
-                            .'|delete(*:156)'
+                    .'|s(?'
+                        .'|alades/(?'
+                            .'|([^/]++)(*:110)'
+                            .'|new(*:121)'
+                            .'|([^/]++)/(?'
+                                .'|edit(*:145)'
+                                .'|delete(*:159)'
+                            .')'
                         .')'
+                        .'|ettings/check\\-usage/([^/]++)/([^/]++)(*:207)'
                     .')'
                     .'|entrees/([^/]++)/(?'
-                        .'|edit(*:190)'
-                        .'|delete(*:204)'
+                        .'|edit(*:240)'
+                        .'|delete(*:254)'
                     .')'
                     .'|plats/([^/]++)/(?'
-                        .'|edit(*:235)'
-                        .'|delete(*:249)'
+                        .'|edit(*:285)'
+                        .'|delete(*:299)'
                     .')'
                     .'|accompagnements/([^/]++)/(?'
-                        .'|edit(*:290)'
-                        .'|delete(*:304)'
+                        .'|edit(*:340)'
+                        .'|delete(*:354)'
                     .')'
-                    .'|reservation/([^/]++)(?'
-                        .'|(*:336)'
-                        .'|/mark\\-served(*:357)'
+                    .'|reservation(?'
+                        .'|s/(\\d{4}-\\d{2}-\\d{2})(?'
+                            .'|(*:401)'
+                            .'|/pdf(*:413)'
+                        .')'
+                        .'|/([^/]++)(?'
+                            .'|(*:434)'
+                            .'|/mark\\-served(*:455)'
+                        .')'
                     .')'
                 .')'
                 .'|/employee/(?'
                     .'|reserv(?'
-                        .'|e/([^/]++)(*:399)'
-                        .'|ation/([^/]++)/cancel(*:428)'
+                        .'|e/([^/]++)(*:498)'
+                        .'|ation/([^/]++)/cancel(*:527)'
                     .')'
-                    .'|meal\\-details/([^/]++)(*:459)'
+                    .'|meal\\-details/([^/]++)(*:558)'
                 .')'
             .')/?$}sDu',
     ],
@@ -76,21 +88,24 @@ return [
         35 => [[['_route' => 'chef_menu_day', '_controller' => 'App\\Controller\\ChefController::menuDay'], ['date'], ['GET' => 0, 'POST' => 1], null, false, true, null]],
         60 => [[['_route' => 'chef_select_menu_complet', '_controller' => 'App\\Controller\\ChefController::selectMenuComplet'], ['date'], ['GET' => 0, 'POST' => 1], null, false, true, null]],
         80 => [[['_route' => 'chef_manage_meals', '_controller' => 'App\\Controller\\ChefController::manageMeals'], ['date'], ['GET' => 0, 'POST' => 1], null, false, true, null]],
-        107 => [[['_route' => 'chef_select_salades', '_controller' => 'App\\Controller\\ChefController::selectSalades'], ['date'], ['GET' => 0, 'POST' => 1], null, false, true, null]],
-        118 => [[['_route' => 'chef_salades_new', '_controller' => 'App\\Controller\\ChefController::saladesNew'], [], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        142 => [[['_route' => 'chef_salades_edit', '_controller' => 'App\\Controller\\ChefController::saladesEdit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        156 => [[['_route' => 'chef_salades_delete', '_controller' => 'App\\Controller\\ChefController::saladesDelete'], ['id'], ['POST' => 0], null, false, false, null]],
-        190 => [[['_route' => 'chef_entrees_edit', '_controller' => 'App\\Controller\\ChefController::entreesEdit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        204 => [[['_route' => 'chef_entrees_delete', '_controller' => 'App\\Controller\\ChefController::entreesDelete'], ['id'], ['POST' => 0], null, false, false, null]],
-        235 => [[['_route' => 'chef_plats_edit', '_controller' => 'App\\Controller\\ChefController::platsEdit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        249 => [[['_route' => 'chef_plats_delete', '_controller' => 'App\\Controller\\ChefController::platsDelete'], ['id'], ['POST' => 0], null, false, false, null]],
-        290 => [[['_route' => 'chef_accompagnements_edit', '_controller' => 'App\\Controller\\ChefController::accompagnementsEdit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        304 => [[['_route' => 'chef_accompagnements_delete', '_controller' => 'App\\Controller\\ChefController::accompagnementsDelete'], ['id'], ['POST' => 0], null, false, false, null]],
-        336 => [[['_route' => 'chef_reservation_details', '_controller' => 'App\\Controller\\ChefController::reservationDetails'], ['id'], null, null, false, true, null]],
-        357 => [[['_route' => 'chef_reservation_mark_served', '_controller' => 'App\\Controller\\ChefController::markServed'], ['id'], ['POST' => 0], null, false, false, null]],
-        399 => [[['_route' => 'employee_reserve', '_controller' => 'App\\Controller\\EmployeeController::reserve'], ['date'], ['GET' => 0, 'POST' => 1], null, false, true, null]],
-        428 => [[['_route' => 'employee_reservation_cancel', '_controller' => 'App\\Controller\\EmployeeController::cancelReservation'], ['id'], ['POST' => 0], null, false, false, null]],
-        459 => [
+        110 => [[['_route' => 'chef_select_salades', '_controller' => 'App\\Controller\\ChefController::selectSalades'], ['date'], ['GET' => 0, 'POST' => 1], null, false, true, null]],
+        121 => [[['_route' => 'chef_salades_new', '_controller' => 'App\\Controller\\ChefController::saladesNew'], [], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        145 => [[['_route' => 'chef_salades_edit', '_controller' => 'App\\Controller\\ChefController::saladesEdit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        159 => [[['_route' => 'chef_salades_delete', '_controller' => 'App\\Controller\\ChefController::saladesDelete'], ['id'], ['POST' => 0], null, false, false, null]],
+        207 => [[['_route' => 'chef_settings_check_usage', '_controller' => 'App\\Controller\\ChefController::checkUsage'], ['type', 'id'], ['GET' => 0], null, false, true, null]],
+        240 => [[['_route' => 'chef_entrees_edit', '_controller' => 'App\\Controller\\ChefController::entreesEdit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        254 => [[['_route' => 'chef_entrees_delete', '_controller' => 'App\\Controller\\ChefController::entreesDelete'], ['id'], ['POST' => 0], null, false, false, null]],
+        285 => [[['_route' => 'chef_plats_edit', '_controller' => 'App\\Controller\\ChefController::platsEdit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        299 => [[['_route' => 'chef_plats_delete', '_controller' => 'App\\Controller\\ChefController::platsDelete'], ['id'], ['POST' => 0], null, false, false, null]],
+        340 => [[['_route' => 'chef_accompagnements_edit', '_controller' => 'App\\Controller\\ChefController::accompagnementsEdit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        354 => [[['_route' => 'chef_accompagnements_delete', '_controller' => 'App\\Controller\\ChefController::accompagnementsDelete'], ['id'], ['POST' => 0], null, false, false, null]],
+        401 => [[['_route' => 'chef_reservations_date', '_controller' => 'App\\Controller\\ChefController::reservations'], ['date'], null, null, false, true, null]],
+        413 => [[['_route' => 'chef_reservations_pdf', '_controller' => 'App\\Controller\\ChefController::reservationsPdf'], ['date'], null, null, false, false, null]],
+        434 => [[['_route' => 'chef_reservation_details', '_controller' => 'App\\Controller\\ChefController::reservationDetails'], ['id'], null, null, false, true, null]],
+        455 => [[['_route' => 'chef_reservation_mark_served', '_controller' => 'App\\Controller\\ChefController::markServed'], ['id'], ['POST' => 0], null, false, false, null]],
+        498 => [[['_route' => 'employee_reserve', '_controller' => 'App\\Controller\\EmployeeController::reserve'], ['date'], ['GET' => 0, 'POST' => 1], null, false, true, null]],
+        527 => [[['_route' => 'employee_reservation_cancel', '_controller' => 'App\\Controller\\EmployeeController::cancelReservation'], ['id'], ['POST' => 0], null, false, false, null]],
+        558 => [
             [['_route' => 'employee_meal_details', '_controller' => 'App\\Controller\\EmployeeController::mealDetails'], ['id'], ['GET' => 0], null, false, true, null],
             [null, null, null, null, false, false, 0],
         ],

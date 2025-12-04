@@ -216,6 +216,19 @@
     <service id="App\Entity" class="App\Entity" abstract="true">
       <tag name="container.excluded" source="in &quot;config/services.yaml&quot;"/>
     </service>
+    <service id="App\Command\CreateFakeDataCommand" class="App\Command\CreateFakeDataCommand" autowire="true" autoconfigure="true">
+      <tag name="console.command" command="app:create-fake-data" description="Crée des utilisateurs et réservations fake pour rendre l'application plus réaliste" help=""/>
+      <tag name="console.command"/>
+      <tag name="container.no_preload"/>
+      <argument type="service" id="doctrine.orm.default_entity_manager"/>
+      <argument type="service" id="security.user_password_hasher"/>
+      <call method="setName">
+        <argument>app:create-fake-data</argument>
+      </call>
+      <call method="setDescription">
+        <argument>Crée des utilisateurs et réservations fake pour rendre l'application plus réaliste</argument>
+      </call>
+    </service>
     <service id="App\Command\CreateTestDataCommand" class="App\Command\CreateTestDataCommand" autowire="true" autoconfigure="true">
       <tag name="console.command" command="app:create-test-data" description="Crée les données de test (plats, menus, etc.)" help=""/>
       <tag name="console.command"/>
@@ -386,7 +399,7 @@
     </service>
     <service id="argument_resolver.service" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">
       <tag priority="-50" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">controller.argument_value_resolver</tag>
-      <argument type="service" id=".service_locator.eGII6RU"/>
+      <argument type="service" id=".service_locator.u4xP31P"/>
     </service>
     <service id="argument_resolver.default" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">
       <tag priority="-100" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">controller.argument_value_resolver</tag>
@@ -1898,7 +1911,7 @@
     </service>
     <service id="argument_resolver.not_tagged_controller" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedControllerValueResolver">
       <tag name="controller.argument_value_resolver" priority="-200"/>
-      <argument type="service" id=".service_locator.eGII6RU"/>
+      <argument type="service" id=".service_locator.u4xP31P"/>
     </service>
     <service id="routing.resolver" class="Symfony\Component\Config\Loader\LoaderResolver">
       <call method="addLoader">
@@ -4944,6 +4957,9 @@
       <argument type="service" id="maker.file_manager"/>
       <argument type="service" id="maker.generator"/>
     </service>
+    <service id=".instanceof.Symfony\Component\Console\Command\Command.0.App\Command\CreateFakeDataCommand" class="App\Command\CreateFakeDataCommand" autowire="true" abstract="true"/>
+    <service id=".instanceof.App\Command\CreateFakeDataCommand.0.App\Command\CreateFakeDataCommand" class="App\Command\CreateFakeDataCommand" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Command\CreateFakeDataCommand" class="App\Command\CreateFakeDataCommand" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Component\Console\Command\Command.0.App\Command\CreateTestDataCommand" class="App\Command\CreateTestDataCommand" autowire="true" abstract="true"/>
     <service id=".instanceof.App\Command\CreateTestDataCommand.0.App\Command\CreateTestDataCommand" class="App\Command\CreateTestDataCommand" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Command\CreateTestDataCommand" class="App\Command\CreateTestDataCommand" autowire="true" autoconfigure="true" abstract="true"/>
@@ -5744,18 +5760,25 @@
       <argument type="service" id="service_container"/>
       <factory service=".service_locator.Kq27LHM" method="withContext"/>
     </service>
-    <service id=".service_locator.UVurlxM" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.GlRetf_" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="reservationRepo" type="service_closure" id="App\Repository\ReservationRepository"/>
+        <argument key="messRequestRepo" type="service_closure" id="App\Repository\MessRequestRepository"/>
         <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
       </argument>
     </service>
-    <service id=".service_locator.UVurlxM.App\Controller\ChefController::reservations()" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.GlRetf_.App\Controller\ChefController::reservations()" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\ChefController::reservations()"/>
       <argument>App\Controller\ChefController::reservations()</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.UVurlxM" method="withContext"/>
+      <factory service=".service_locator.GlRetf_" method="withContext"/>
+    </service>
+    <service id=".service_locator.GlRetf_.App\Controller\ChefController::reservationsPdf()" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator_context" id="App\Controller\ChefController::reservationsPdf()"/>
+      <argument>App\Controller\ChefController::reservationsPdf()</argument>
+      <argument type="service" id="service_container"/>
+      <factory service=".service_locator.GlRetf_" method="withContext"/>
     </service>
     <service id=".service_locator.ncBLt3G" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
@@ -5785,6 +5808,12 @@
     <service id=".service_locator.Kq27LHM.App\Controller\ChefController::settings()" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\ChefController::settings()"/>
       <argument>App\Controller\ChefController::settings()</argument>
+      <argument type="service" id="service_container"/>
+      <factory service=".service_locator.Kq27LHM" method="withContext"/>
+    </service>
+    <service id=".service_locator.Kq27LHM.App\Controller\ChefController::checkUsage()" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator_context" id="App\Controller\ChefController::checkUsage()"/>
+      <argument>App\Controller\ChefController::checkUsage()</argument>
       <argument type="service" id="service_container"/>
       <factory service=".service_locator.Kq27LHM" method="withContext"/>
     </service>
@@ -5854,6 +5883,25 @@
       <argument type="service" id="service_container"/>
       <factory service=".service_locator.HKv6Vyy" method="withContext"/>
     </service>
+    <service id=".service_locator.Kq27LHM.App\Controller\EmployeeController::creditBalance()" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator_context" id="App\Controller\EmployeeController::creditBalance()"/>
+      <argument>App\Controller\EmployeeController::creditBalance()</argument>
+      <argument type="service" id="service_container"/>
+      <factory service=".service_locator.Kq27LHM" method="withContext"/>
+    </service>
+    <service id=".service_locator.lQAlGdR" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+        <argument key="hasher" type="service_closure" id="security.user_password_hasher"/>
+      </argument>
+    </service>
+    <service id=".service_locator.lQAlGdR.App\Controller\EmployeeController::changePassword()" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator_context" id="App\Controller\EmployeeController::changePassword()"/>
+      <argument>App\Controller\EmployeeController::changePassword()</argument>
+      <argument type="service" id="service_container"/>
+      <factory service=".service_locator.lQAlGdR" method="withContext"/>
+    </service>
     <service id=".service_locator.UU53M2H" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
@@ -5879,7 +5927,7 @@
       <argument type="service" id="service_container"/>
       <factory service=".service_locator.xkWA7vv" method="withContext"/>
     </service>
-    <service id=".service_locator.eGII6RU" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.u4xP31P" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="kernel::registerContainerConfiguration" type="service_closure" id=".service_locator.zHyJIs5.kernel::registerContainerConfiguration()"/>
@@ -5907,10 +5955,12 @@
         <argument key="App\Controller\ChefController::saladesNew" type="service_closure" id=".service_locator.Kq27LHM.App\Controller\ChefController::saladesNew()"/>
         <argument key="App\Controller\ChefController::saladesEdit" type="service_closure" id=".service_locator.Kq27LHM.App\Controller\ChefController::saladesEdit()"/>
         <argument key="App\Controller\ChefController::saladesDelete" type="service_closure" id=".service_locator.Kq27LHM.App\Controller\ChefController::saladesDelete()"/>
-        <argument key="App\Controller\ChefController::reservations" type="service_closure" id=".service_locator.UVurlxM.App\Controller\ChefController::reservations()"/>
+        <argument key="App\Controller\ChefController::reservations" type="service_closure" id=".service_locator.GlRetf_.App\Controller\ChefController::reservations()"/>
+        <argument key="App\Controller\ChefController::reservationsPdf" type="service_closure" id=".service_locator.GlRetf_.App\Controller\ChefController::reservationsPdf()"/>
         <argument key="App\Controller\ChefController::reservationDetails" type="service_closure" id=".service_locator.ncBLt3G.App\Controller\ChefController::reservationDetails()"/>
         <argument key="App\Controller\ChefController::markServed" type="service_closure" id=".service_locator.QO4wEWI.App\Controller\ChefController::markServed()"/>
         <argument key="App\Controller\ChefController::settings" type="service_closure" id=".service_locator.Kq27LHM.App\Controller\ChefController::settings()"/>
+        <argument key="App\Controller\ChefController::checkUsage" type="service_closure" id=".service_locator.Kq27LHM.App\Controller\ChefController::checkUsage()"/>
         <argument key="App\Controller\EmployeeController::dashboard" type="service_closure" id=".service_locator.quwmMpH.App\Controller\EmployeeController::dashboard()"/>
         <argument key="App\Controller\EmployeeController::credit" type="service_closure" id=".service_locator.Kq27LHM.App\Controller\EmployeeController::credit()"/>
         <argument key="App\Controller\EmployeeController::reserve" type="service_closure" id=".service_locator.G9GZdsS.App\Controller\EmployeeController::reserve()"/>
@@ -5918,6 +5968,8 @@
         <argument key="App\Controller\EmployeeController::cancelReservation" type="service_closure" id=".service_locator.QO4wEWI.App\Controller\EmployeeController::cancelReservation()"/>
         <argument key="App\Controller\EmployeeController::reservations" type="service_closure" id=".service_locator.ncBLt3G.App\Controller\EmployeeController::reservations()"/>
         <argument key="App\Controller\EmployeeController::mess" type="service_closure" id=".service_locator.HKv6Vyy.App\Controller\EmployeeController::mess()"/>
+        <argument key="App\Controller\EmployeeController::creditBalance" type="service_closure" id=".service_locator.Kq27LHM.App\Controller\EmployeeController::creditBalance()"/>
+        <argument key="App\Controller\EmployeeController::changePassword" type="service_closure" id=".service_locator.lQAlGdR.App\Controller\EmployeeController::changePassword()"/>
         <argument key="App\Controller\RegistrationController::__invoke" type="service_closure" id=".service_locator.UU53M2H.App\Controller\RegistrationController::__invoke()"/>
         <argument key="App\Controller\SecurityController::login" type="service_closure" id=".service_locator.xkWA7vv.App\Controller\SecurityController::login()"/>
         <argument key="kernel:registerContainerConfiguration" type="service_closure" id=".service_locator.zHyJIs5.kernel::registerContainerConfiguration()"/>
@@ -5943,10 +5995,12 @@
         <argument key="App\Controller\ChefController:saladesNew" type="service_closure" id=".service_locator.Kq27LHM.App\Controller\ChefController::saladesNew()"/>
         <argument key="App\Controller\ChefController:saladesEdit" type="service_closure" id=".service_locator.Kq27LHM.App\Controller\ChefController::saladesEdit()"/>
         <argument key="App\Controller\ChefController:saladesDelete" type="service_closure" id=".service_locator.Kq27LHM.App\Controller\ChefController::saladesDelete()"/>
-        <argument key="App\Controller\ChefController:reservations" type="service_closure" id=".service_locator.UVurlxM.App\Controller\ChefController::reservations()"/>
+        <argument key="App\Controller\ChefController:reservations" type="service_closure" id=".service_locator.GlRetf_.App\Controller\ChefController::reservations()"/>
+        <argument key="App\Controller\ChefController:reservationsPdf" type="service_closure" id=".service_locator.GlRetf_.App\Controller\ChefController::reservationsPdf()"/>
         <argument key="App\Controller\ChefController:reservationDetails" type="service_closure" id=".service_locator.ncBLt3G.App\Controller\ChefController::reservationDetails()"/>
         <argument key="App\Controller\ChefController:markServed" type="service_closure" id=".service_locator.QO4wEWI.App\Controller\ChefController::markServed()"/>
         <argument key="App\Controller\ChefController:settings" type="service_closure" id=".service_locator.Kq27LHM.App\Controller\ChefController::settings()"/>
+        <argument key="App\Controller\ChefController:checkUsage" type="service_closure" id=".service_locator.Kq27LHM.App\Controller\ChefController::checkUsage()"/>
         <argument key="App\Controller\EmployeeController:dashboard" type="service_closure" id=".service_locator.quwmMpH.App\Controller\EmployeeController::dashboard()"/>
         <argument key="App\Controller\EmployeeController:credit" type="service_closure" id=".service_locator.Kq27LHM.App\Controller\EmployeeController::credit()"/>
         <argument key="App\Controller\EmployeeController:reserve" type="service_closure" id=".service_locator.G9GZdsS.App\Controller\EmployeeController::reserve()"/>
@@ -5954,6 +6008,8 @@
         <argument key="App\Controller\EmployeeController:cancelReservation" type="service_closure" id=".service_locator.QO4wEWI.App\Controller\EmployeeController::cancelReservation()"/>
         <argument key="App\Controller\EmployeeController:reservations" type="service_closure" id=".service_locator.ncBLt3G.App\Controller\EmployeeController::reservations()"/>
         <argument key="App\Controller\EmployeeController:mess" type="service_closure" id=".service_locator.HKv6Vyy.App\Controller\EmployeeController::mess()"/>
+        <argument key="App\Controller\EmployeeController:creditBalance" type="service_closure" id=".service_locator.Kq27LHM.App\Controller\EmployeeController::creditBalance()"/>
+        <argument key="App\Controller\EmployeeController:changePassword" type="service_closure" id=".service_locator.lQAlGdR.App\Controller\EmployeeController::changePassword()"/>
         <argument key="App\Controller\RegistrationController:__invoke" type="service_closure" id=".service_locator.UU53M2H.App\Controller\RegistrationController::__invoke()"/>
         <argument key="App\Controller\RegistrationController" type="service_closure" id=".service_locator.UU53M2H.App\Controller\RegistrationController::__invoke()"/>
         <argument key="App\Controller\SecurityController:login" type="service_closure" id=".service_locator.xkWA7vv.App\Controller\SecurityController::login()"/>
@@ -6388,6 +6444,13 @@
     </service>
     <service id=".errored..service_locator.zHyJIs5.Symfony\Component\Config\Loader\LoaderInterface" class="Symfony\Component\Config\Loader\LoaderInterface">
       <tag name="container.error" message="Cannot autowire service &quot;.service_locator.zHyJIs5&quot;: it needs an instance of &quot;Symfony\Component\Config\Loader\LoaderInterface&quot; but this type has been excluded from autowiring."/>
+    </service>
+    <service id=".App\Command\CreateFakeDataCommand.lazy" class="Symfony\Component\Console\Command\LazyCommand">
+      <argument>app:create-fake-data</argument>
+      <argument type="collection"/>
+      <argument>Crée des utilisateurs et réservations fake pour rendre l'application plus réaliste</argument>
+      <argument>false</argument>
+      <argument type="service_closure" id="App\Command\CreateFakeDataCommand"/>
     </service>
     <service id=".App\Command\CreateTestDataCommand.lazy" class="Symfony\Component\Console\Command\LazyCommand">
       <argument>app:create-test-data</argument>
@@ -6928,8 +6991,9 @@
     </service>
     <service id="console.command_loader" class="Symfony\Component\Console\CommandLoader\ContainerCommandLoader" public="true">
       <tag name="container.no_preload"/>
-      <argument type="service" id=".service_locator.tcmgloH"/>
+      <argument type="service" id=".service_locator.Qcza7_5"/>
       <argument type="collection">
+        <argument key="app:create-fake-data">App\Command\CreateFakeDataCommand</argument>
         <argument key="app:create-test-data">App\Command\CreateTestDataCommand</argument>
         <argument key="app:create-test-users">App\Command\CreateTestUsersCommand</argument>
         <argument key="about">console.command.about</argument>
@@ -7027,9 +7091,10 @@
         <argument key="make:webhook">maker.auto_command.make_webhook</argument>
       </argument>
     </service>
-    <service id=".service_locator.tcmgloH" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.Qcza7_5" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
+        <argument key="App\Command\CreateFakeDataCommand" type="service_closure" id=".App\Command\CreateFakeDataCommand.lazy"/>
         <argument key="App\Command\CreateTestDataCommand" type="service_closure" id=".App\Command\CreateTestDataCommand.lazy"/>
         <argument key="App\Command\CreateTestUsersCommand" type="service_closure" id=".App\Command\CreateTestUsersCommand.lazy"/>
         <argument key="console.command.about" type="service_closure" id=".console.command.about.lazy"/>
@@ -7250,7 +7315,7 @@
     <service id="Symfony\WebpackEncoreBundle\Asset\EntrypointLookupInterface" alias="webpack_encore.entrypoint_lookup[_default]"/>
     <service id="container.env_var_processors_locator" alias=".service_locator.pRu6x_4" public="true"/>
     <service id="twig.loader.filesystem" alias="twig.loader.native_filesystem"/>
-    <service id="argument_resolver.controller_locator" alias=".service_locator.eGII6RU"/>
+    <service id="argument_resolver.controller_locator" alias=".service_locator.u4xP31P"/>
     <service id="twig.loader" alias="twig.loader.native_filesystem"/>
     <service id="doctrine.id_generator_locator" alias=".service_locator.BxSdgVt"/>
     <service id="Psr\Log\LoggerInterface" alias="logger"/>
@@ -7269,12 +7334,13 @@
     <service id=".service_locator.HLNX62M" alias=".service_locator._nIy_GB"/>
     <service id=".service_locator.pFk_jyA" alias=".service_locator.CDTyXuX"/>
     <service id=".service_locator.HQZddX8" alias=".service_locator.Kq27LHM"/>
-    <service id=".service_locator.3fHsCKt" alias=".service_locator.UVurlxM"/>
+    <service id=".service_locator.9V6clgP" alias=".service_locator.GlRetf_"/>
     <service id=".service_locator.BPaXe_4" alias=".service_locator.ncBLt3G"/>
     <service id=".service_locator.U_ger5A" alias=".service_locator.QO4wEWI"/>
     <service id=".service_locator.no8WNgl" alias=".service_locator.quwmMpH"/>
     <service id=".service_locator.6nhCqzK" alias=".service_locator.G9GZdsS"/>
     <service id=".service_locator.iUxN36D" alias=".service_locator.HKv6Vyy"/>
+    <service id=".service_locator.9djdHws" alias=".service_locator.lQAlGdR"/>
     <service id=".service_locator.sg5RGTZ" alias=".service_locator.UU53M2H"/>
     <service id=".service_locator.809WiP2" alias=".service_locator.xkWA7vv"/>
     <service id=".service_locator.YoE4GGP" alias=".service_locator.ZyP9f7K"/>

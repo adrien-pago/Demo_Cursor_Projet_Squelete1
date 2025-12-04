@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const menuCompletSection = document.getElementById('menu-complet-section');
   const saladeSection = document.getElementById('salade-section');
   const messSection = document.getElementById('mess-section');
-  const lieuIcons = document.querySelectorAll('.lieu-icon-wrapper');
+  const lieuItems = document.querySelectorAll('.lieu-item');
   const reservationForm = document.getElementById('reservation-form');
   const formFormule = document.getElementById('form-formule');
   const formLieu = document.getElementById('form-lieu');
@@ -44,12 +44,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 messSection.style.display = 'none';
                 // Afficher le footer normal
                 const footerCancelBtn = document.getElementById('footer-cancel-btn');
-                const lieuxIcons = document.getElementById('lieux-icons');
-                const footerValidateBtn = document.getElementById('footer-validate-btn');
+                const validateContainer = document.getElementById('validate-container');
                 const messFooterButtons = document.getElementById('mess-footer-buttons');
                 if (footerCancelBtn) footerCancelBtn.style.display = 'flex';
-                if (lieuxIcons) lieuxIcons.style.display = 'flex';
-                if (footerValidateBtn) footerValidateBtn.style.display = 'block';
+                if (validateContainer) validateContainer.style.display = 'flex';
                 if (messFooterButtons) messFooterButtons.style.display = 'none';
               } else if (formuleName === 'salade') {
                 menuCompletSection.style.display = 'none';
@@ -57,12 +55,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 messSection.style.display = 'none';
                 // Afficher le footer normal
                 const footerCancelBtn = document.getElementById('footer-cancel-btn');
-                const lieuxIcons = document.getElementById('lieux-icons');
-                const footerValidateBtn = document.getElementById('footer-validate-btn');
+                const validateContainer = document.getElementById('validate-container');
                 const messFooterButtons = document.getElementById('mess-footer-buttons');
                 if (footerCancelBtn) footerCancelBtn.style.display = 'flex';
-                if (lieuxIcons) lieuxIcons.style.display = 'flex';
-                if (footerValidateBtn) footerValidateBtn.style.display = 'block';
+                if (validateContainer) validateContainer.style.display = 'flex';
                 if (messFooterButtons) messFooterButtons.style.display = 'none';
               } else if (formuleName === 'mess') {
                 menuCompletSection.style.display = 'none';
@@ -70,12 +66,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 messSection.style.display = 'block';
                 // Afficher le footer Mess
                 const footerCancelBtn = document.getElementById('footer-cancel-btn');
-                const lieuxIcons = document.getElementById('lieux-icons');
-                const footerValidateBtn = document.getElementById('footer-validate-btn');
+                const validateContainer = document.getElementById('validate-container');
                 const messFooterButtons = document.getElementById('mess-footer-buttons');
                 if (footerCancelBtn) footerCancelBtn.style.display = 'none';
-                if (lieuxIcons) lieuxIcons.style.display = 'none';
-                if (footerValidateBtn) footerValidateBtn.style.display = 'none';
+                if (validateContainer) validateContainer.style.display = 'none';
                 if (messFooterButtons) messFooterButtons.style.display = 'flex';
               }
             });
@@ -100,16 +94,93 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
+  // Fonction pour afficher un message d'information
+  function showInfoMessage(message) {
+    // Supprimer le message précédent s'il existe
+    const existingMessage = document.getElementById('info-message');
+    if (existingMessage) {
+      existingMessage.remove();
+    }
+    
+    // Créer le message
+    const messageDiv = document.createElement('div');
+    messageDiv.id = 'info-message';
+    messageDiv.className = 'info-message';
+    messageDiv.textContent = message;
+    
+    // Insérer le message avant le footer
+    const footer = document.getElementById('reserve-footer');
+    if (footer) {
+      footer.parentNode.insertBefore(messageDiv, footer);
+    } else {
+      document.body.appendChild(messageDiv);
+    }
+    
+    // Supprimer le message après 4 secondes
+    setTimeout(() => {
+      if (messageDiv && messageDiv.parentNode) {
+        messageDiv.classList.add('fade-out');
+        setTimeout(() => {
+          if (messageDiv && messageDiv.parentNode) {
+            messageDiv.remove();
+          }
+        }, 300);
+      }
+    }, 4000);
+  }
+
   // Gestion de la sélection des lieux
-  lieuIcons.forEach(icon => {
-    icon.addEventListener('click', function() {
+  lieuItems.forEach(item => {
+    item.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      
       // Désélectionner tous les lieux
-      lieuIcons.forEach(i => i.classList.remove('active'));
+      lieuItems.forEach(i => i.classList.remove('active'));
       
       // Sélectionner le lieu cliqué
       this.classList.add('active');
       selectedLieu = this.dataset.lieuId;
       formLieu.value = selectedLieu;
+      
+      // Vérifier si on peut soumettre le formulaire
+      if (!selectedFormule || !selectedLieu) {
+        return;
+      }
+      
+      const formuleName = Array.from(formuleCards).find(c => c.dataset.formuleId === selectedFormule)?.dataset.formuleName.toLowerCase();
+      
+      // Vérifier que les sélections requises sont faites
+      let canSubmit = false;
+      
+      if (formuleName === 'menu complet' || formuleName === 'restaurant') {
+        canSubmit = formEntree.value && formPlat.value && formAccompagnement.value;
+        if (!canSubmit) {
+          showInfoMessage('Veuillez choisir votre repas avant de valider.');
+          return;
+        }
+      } else if (formuleName === 'salade') {
+        canSubmit = formSalade.value;
+        if (!canSubmit) {
+          showInfoMessage('Veuillez choisir votre repas avant de valider.');
+          return;
+        }
+      } else if (formuleName === 'mess') {
+        // Mess ne peut pas être réservé pour l'instant
+        canSubmit = false;
+        return;
+      }
+
+      if (canSubmit) {
+        // S'assurer que tous les champs sont bien remplis
+        if (!formFormule.value || !formLieu.value) {
+          showInfoMessage('Erreur: formulaire incomplet. Veuillez réessayer.');
+          return;
+        }
+        
+        // Soumettre le formulaire
+        reservationForm.submit();
+      }
     });
   });
 
@@ -132,30 +203,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // Soumission du formulaire lors du clic sur un lieu (si tout est sélectionné)
-  lieuIcons.forEach(icon => {
-    icon.addEventListener('click', function() {
-      if (selectedFormule && selectedLieu) {
-        const formuleName = Array.from(formuleCards).find(c => c.dataset.formuleId === selectedFormule)?.dataset.formuleName.toLowerCase();
-        
-        // Vérifier que les sélections requises sont faites
-        let canSubmit = false;
-        
-        if (formuleName === 'menu complet' || formuleName === 'restaurant') {
-          canSubmit = formEntree.value && formPlat.value && formAccompagnement.value;
-        } else if (formuleName === 'salade') {
-          canSubmit = formSalade.value;
-        } else if (formuleName === 'mess') {
-          // Mess ne peut pas être réservé pour l'instant
-          canSubmit = false;
-        }
-
-        if (canSubmit) {
-          reservationForm.submit();
-        }
-      }
-    });
-  });
 });
 
 // Fonctions globales pour la modal d'information (doivent être en dehors de DOMContentLoaded pour être accessibles depuis onclick)

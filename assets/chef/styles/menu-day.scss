@@ -132,7 +132,7 @@
   align-items: center;
   padding: 0.875rem 1rem;
   border-radius: 8px;
-  background: #e8f5e9;
+  background: #f1f5f9;
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
@@ -143,7 +143,7 @@
   }
   
   &.closure-mode {
-    background: #e3f2fd;
+    background: #f1f5f9;
     
     &.active {
       background: #bbdefb;
@@ -210,7 +210,7 @@
   align-items: center;
   padding: 0.875rem 1rem;
   border-radius: 8px;
-  background: transparent;
+  background: #f1f5f9;
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;

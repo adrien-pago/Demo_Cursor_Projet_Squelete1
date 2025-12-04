@@ -1,0 +1,92 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon compte{% endblock %}
+
+{% block stylesheets %}
+  {{ encore_entry_link_tags('employee-account') }}
+{% endblock %}
+
+{% block body %}
+<div class="employee-account-wrapper">
+  <div class="account-header">
+    <h1>Mon compte</h1>
+  </div>
+
+  {# Messages flash #}
+  {% for label, messages in app.flashes %}
+    {% for message in messages %}
+      <div class="alert alert-{{ label }}" role="alert">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endfor %}
+
+  <div class="account-content">
+    {# Section Solde #}
+    <div class="account-section">
+      <div class="section-header">
+        <h2>Solde</h2>
+      </div>
+      <div class="section-content">
+        <div class="balance-display">
+          <div class="balance-amount">{{ balance|number_format(2, ',', ' ') }} €</div>
+        </div>
+        <form method="post" action="{{ path('employee_account_credit') }}" class="credit-form">
+          <div class="form-group">
+            <label for="amount" class="form-label">Montant à créditer (€)</label>
+            <input type="number" id="amount" name="amount" class="form-control" step="0.01" min="0.01" required placeholder="0.00">
+          </div>
+          <button type="submit" class="btn-credit">Créditer le solde</button>
+        </form>
+      </div>
+    </div>
+
+    {# Section Informations personnelles #}
+    <div class="account-section">
+      <div class="section-header">
+        <h2>Informations personnelles</h2>
+      </div>
+      <div class="section-content">
+        <div class="info-item">
+          <span class="info-label">Nom complet :</span>
+          <span class="info-value">{{ user.name ?? 'Non renseigné' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Email :</span>
+          <span class="info-value">{{ user.email }}</span>
+        </div>
+      </div>
+    </div>
+
+    {# Section Modifier le mot de passe #}
+    <div class="account-section">
+      <div class="section-header">
+        <h2>Modifier le mot de passe</h2>
+      </div>
+      <div class="section-content">
+        <form method="post" action="{{ path('employee_account_change_password') }}" class="password-form">
+          <div class="form-group">
+            <label for="current_password" class="form-label">Mot de passe actuel</label>
+            <input type="password" id="current_password" name="current_password" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label for="new_password" class="form-label">Nouveau mot de passe</label>
+            <input type="password" id="new_password" name="new_password" class="form-control" minlength="8" required>
+            <small class="form-text">Au moins 8 caractères requis.</small>
+          </div>
+          <div class="form-group">
+            <label for="confirm_password" class="form-label">Confirmer le nouveau mot de passe</label>
+            <input type="password" id="confirm_password" name="confirm_password" class="form-control" minlength="8" required>
+          </div>
+          <button type="submit" class="btn-change-password">Modifier le mot de passe</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+  {{ encore_entry_script_tags('employee-account') }}
+{% endblock %}
+

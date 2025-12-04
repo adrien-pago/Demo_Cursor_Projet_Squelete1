@@ -631,86 +631,94 @@ class __TwigTemplate_f5319cee819cf1f27ce1444e7d5f2381 extends Template
             yield "      <a href=\"";
             yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("employee_dashboard");
             yield "\" class=\"footer-btn cancel-btn\" id=\"footer-cancel-btn\">
-        <img src=\"";
-            // line 247
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("icons/cross-icon.png"), "html", null, true);
-            yield "\" alt=\"Annuler\" class=\"footer-icon\">
+        <span class=\"btn-text\">Annuler</span>
       </a>
       
-      <div class=\"lieux-icons\" id=\"lieux-icons\">
       ";
             // line 251
+            yield "      <div class=\"validate-container\" id=\"validate-container\">
+        <div class=\"validate-label\">Valider</div>
+        <div class=\"lieux-container\" id=\"lieux-container\">
+          ";
+            // line 254
             $context['_parent'] = $context;
-            $context['_seq'] = CoreExtension::ensureTraversable((isset($context["lieusActifs"]) || array_key_exists("lieusActifs", $context) ? $context["lieusActifs"] : (function () { throw new RuntimeError('Variable "lieusActifs" does not exist.', 251, $this->source); })()));
+            $context['_seq'] = CoreExtension::ensureTraversable((isset($context["lieusActifs"]) || array_key_exists("lieusActifs", $context) ? $context["lieusActifs"] : (function () { throw new RuntimeError('Variable "lieusActifs" does not exist.', 254, $this->source); })()));
             foreach ($context['_seq'] as $context["_key"] => $context["lieu"]) {
-                // line 252
-                yield "        ";
-                $context["lieuNameLower"] = Twig\Extension\CoreExtension::lower($this->env->getCharset(), CoreExtension::getAttribute($this->env, $this->source, $context["lieu"], "name", [], "any", false, false, false, 252));
-                // line 253
-                yield "        <div class=\"lieu-icon-wrapper\" data-lieu-id=\"";
-                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["lieu"], "id", [], "any", false, false, false, 253), "html", null, true);
+                // line 255
+                yield "            ";
+                $context["lieuNameLower"] = Twig\Extension\CoreExtension::lower($this->env->getCharset(), CoreExtension::getAttribute($this->env, $this->source, $context["lieu"], "name", [], "any", false, false, false, 255));
+                // line 256
+                yield "            <div class=\"lieu-item\" data-lieu-id=\"";
+                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["lieu"], "id", [], "any", false, false, false, 256), "html", null, true);
                 yield "\">
-          ";
-                // line 254
-                if ((((isset($context["lieuNameLower"]) || array_key_exists("lieuNameLower", $context) ? $context["lieuNameLower"] : (function () { throw new RuntimeError('Variable "lieuNameLower" does not exist.', 254, $this->source); })()) == "restaurant") || ((isset($context["lieuNameLower"]) || array_key_exists("lieuNameLower", $context) ? $context["lieuNameLower"] : (function () { throw new RuntimeError('Variable "lieuNameLower" does not exist.', 254, $this->source); })()) == "sur place"))) {
-                    // line 255
-                    yield "            <img src=\"";
-                    yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("icons/chef-hat.png"), "html", null, true);
-                    yield "\" alt=\"Sur place\" class=\"lieu-icon\" title=\"Sur place\">
-          ";
-                } elseif (($this->extensions['App\Twig\AppExtension']->contains(                // line 256
-(isset($context["lieuNameLower"]) || array_key_exists("lieuNameLower", $context) ? $context["lieuNameLower"] : (function () { throw new RuntimeError('Variable "lieuNameLower" does not exist.', 256, $this->source); })()), "emporter") || $this->extensions['App\Twig\AppExtension']->contains((isset($context["lieuNameLower"]) || array_key_exists("lieuNameLower", $context) ? $context["lieuNameLower"] : (function () { throw new RuntimeError('Variable "lieuNameLower" does not exist.', 256, $this->source); })()), "à emporter"))) {
-                    // line 257
-                    yield "            <img src=\"";
-                    yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("icons/shopping-bag.png"), "html", null, true);
-                    yield "\" alt=\"À emporter\" class=\"lieu-icon\" title=\"À emporter\">
-          ";
-                } elseif ((($this->extensions['App\Twig\AppExtension']->contains(                // line 258
-(isset($context["lieuNameLower"]) || array_key_exists("lieuNameLower", $context) ? $context["lieuNameLower"] : (function () { throw new RuntimeError('Variable "lieuNameLower" does not exist.', 258, $this->source); })()), "livraison") || $this->extensions['App\Twig\AppExtension']->contains((isset($context["lieuNameLower"]) || array_key_exists("lieuNameLower", $context) ? $context["lieuNameLower"] : (function () { throw new RuntimeError('Variable "lieuNameLower" does not exist.', 258, $this->source); })()), "bureau")) || $this->extensions['App\Twig\AppExtension']->contains((isset($context["lieuNameLower"]) || array_key_exists("lieuNameLower", $context) ? $context["lieuNameLower"] : (function () { throw new RuntimeError('Variable "lieuNameLower" does not exist.', 258, $this->source); })()), "delivery"))) {
+              <div class=\"lieu-icon-wrapper\">
+                ";
+                // line 258
+                if ((((isset($context["lieuNameLower"]) || array_key_exists("lieuNameLower", $context) ? $context["lieuNameLower"] : (function () { throw new RuntimeError('Variable "lieuNameLower" does not exist.', 258, $this->source); })()) == "restaurant") || ((isset($context["lieuNameLower"]) || array_key_exists("lieuNameLower", $context) ? $context["lieuNameLower"] : (function () { throw new RuntimeError('Variable "lieuNameLower" does not exist.', 258, $this->source); })()) == "sur place"))) {
                     // line 259
-                    yield "            <img src=\"";
+                    yield "                  <img src=\"";
+                    yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("icons/chef-hat.png"), "html", null, true);
+                    yield "\" alt=\"Sur place\" class=\"lieu-icon\">
+                ";
+                } elseif (($this->extensions['App\Twig\AppExtension']->contains(                // line 260
+(isset($context["lieuNameLower"]) || array_key_exists("lieuNameLower", $context) ? $context["lieuNameLower"] : (function () { throw new RuntimeError('Variable "lieuNameLower" does not exist.', 260, $this->source); })()), "emporter") || $this->extensions['App\Twig\AppExtension']->contains((isset($context["lieuNameLower"]) || array_key_exists("lieuNameLower", $context) ? $context["lieuNameLower"] : (function () { throw new RuntimeError('Variable "lieuNameLower" does not exist.', 260, $this->source); })()), "à emporter"))) {
+                    // line 261
+                    yield "                  <img src=\"";
+                    yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("icons/shopping-bag.png"), "html", null, true);
+                    yield "\" alt=\"À emporter\" class=\"lieu-icon\">
+                ";
+                } elseif ((($this->extensions['App\Twig\AppExtension']->contains(                // line 262
+(isset($context["lieuNameLower"]) || array_key_exists("lieuNameLower", $context) ? $context["lieuNameLower"] : (function () { throw new RuntimeError('Variable "lieuNameLower" does not exist.', 262, $this->source); })()), "livraison") || $this->extensions['App\Twig\AppExtension']->contains((isset($context["lieuNameLower"]) || array_key_exists("lieuNameLower", $context) ? $context["lieuNameLower"] : (function () { throw new RuntimeError('Variable "lieuNameLower" does not exist.', 262, $this->source); })()), "bureau")) || $this->extensions['App\Twig\AppExtension']->contains((isset($context["lieuNameLower"]) || array_key_exists("lieuNameLower", $context) ? $context["lieuNameLower"] : (function () { throw new RuntimeError('Variable "lieuNameLower" does not exist.', 262, $this->source); })()), "delivery"))) {
+                    // line 263
+                    yield "                  <img src=\"";
                     yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("icons/Idelivery-truck.png"), "html", null, true);
-                    yield "\" alt=\"Livraison\" class=\"lieu-icon\" title=\"Livraison\">
-          ";
+                    yield "\" alt=\"Livraison\" class=\"lieu-icon\">
+                ";
                 }
-                // line 261
-                yield "        </div>
-      ";
+                // line 265
+                yield "              </div>
+              <span class=\"lieu-label\">";
+                // line 266
+                yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(CoreExtension::getAttribute($this->env, $this->source, $context["lieu"], "name", [], "any", false, false, false, 266), "html", null, true);
+                yield "</span>
+            </div>
+          ";
             }
             $_parent = $context['_parent'];
             unset($context['_seq'], $context['_key'], $context['lieu'], $context['_parent']);
             $context = array_intersect_key($context, $_parent) + $_parent;
-            // line 263
-            yield "      </div>
-      <button type=\"submit\" class=\"btn btn-primary validate-btn\" form=\"reservation-form\" id=\"footer-validate-btn\">Valider</button>
+            // line 269
+            yield "        </div>
+      </div>
     ";
         }
-        // line 266
+        // line 272
         yield "    
     ";
-        // line 268
+        // line 274
         yield "    <div class=\"mess-footer-buttons\" id=\"mess-footer-buttons\" style=\"display: none;\">
       <a href=\"";
-        // line 269
+        // line 275
         yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("employee_dashboard");
         yield "\" class=\"footer-btn cancel-btn\">
-        <img src=\"";
-        // line 270
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("icons/cross-icon.png"), "html", null, true);
-        yield "\" alt=\"Annuler\" class=\"footer-icon\">
+        <span class=\"btn-text\">Annuler</span>
       </a>
       <button type=\"submit\" form=\"mess-form\" class=\"mess-submit-btn-footer\">Envoyer le message</button>
     </div>
   </div>
 
   ";
-        // line 277
+        // line 283
         yield "  <form method=\"post\" action=\"";
         yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("employee_reserve_post");
         yield "\" id=\"reservation-form\" style=\"display: none;\">
+    <input type=\"hidden\" name=\"_token\" value=\"";
+        // line 284
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->env->getRuntime('Symfony\Component\Form\FormRenderer')->renderCsrfToken("reservation"), "html", null, true);
+        yield "\">
     <input type=\"hidden\" name=\"date\" value=\"";
-        // line 278
-        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Twig\Extension\CoreExtension']->formatDate((isset($context["date"]) || array_key_exists("date", $context) ? $context["date"] : (function () { throw new RuntimeError('Variable "date" does not exist.', 278, $this->source); })()), "Y-m-d"), "html", null, true);
+        // line 285
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->extensions['Twig\Extension\CoreExtension']->formatDate((isset($context["date"]) || array_key_exists("date", $context) ? $context["date"] : (function () { throw new RuntimeError('Variable "date" does not exist.', 285, $this->source); })()), "Y-m-d"), "html", null, true);
         yield "\">
     <input type=\"hidden\" name=\"formule\" id=\"form-formule\" value=\"\">
     <input type=\"hidden\" name=\"lieu\" id=\"form-lieu\" value=\"\">
@@ -722,7 +730,7 @@ class __TwigTemplate_f5319cee819cf1f27ce1444e7d5f2381 extends Template
 </div>
 
 ";
-        // line 289
+        // line 296
         yield "<div id=\"item-info-modal\" class=\"item-info-modal\">
   <div class=\"item-info-overlay\" onclick=\"closeItemInfo()\"></div>
   <div class=\"item-info-content\">
@@ -739,7 +747,7 @@ class __TwigTemplate_f5319cee819cf1f27ce1444e7d5f2381 extends Template
         yield from [];
     }
 
-    // line 300
+    // line 307
     /**
      * @return iterable<null|scalar|\Stringable>
      */
@@ -777,7 +785,7 @@ class __TwigTemplate_f5319cee819cf1f27ce1444e7d5f2381 extends Template
      */
     public function getDebugInfo(): array
     {
-        return array (  743 => 300,  726 => 289,  713 => 278,  708 => 277,  699 => 270,  695 => 269,  692 => 268,  689 => 266,  684 => 263,  677 => 261,  671 => 259,  669 => 258,  664 => 257,  662 => 256,  657 => 255,  655 => 254,  650 => 253,  647 => 252,  643 => 251,  636 => 247,  631 => 246,  629 => 245,  627 => 244,  624 => 243,  621 => 241,  617 => 239,  608 => 232,  584 => 209,  577 => 203,  570 => 199,  568 => 198,  558 => 195,  555 => 194,  553 => 193,  551 => 192,  548 => 191,  544 => 188,  539 => 185,  529 => 181,  523 => 180,  518 => 178,  514 => 177,  508 => 176,  503 => 175,  499 => 174,  492 => 169,  490 => 168,  487 => 167,  483 => 164,  478 => 161,  468 => 157,  462 => 156,  457 => 154,  453 => 153,  447 => 152,  442 => 151,  438 => 150,  431 => 145,  428 => 144,  425 => 142,  420 => 139,  410 => 135,  404 => 134,  399 => 132,  395 => 131,  389 => 130,  384 => 129,  380 => 128,  373 => 123,  370 => 122,  367 => 120,  362 => 117,  352 => 113,  346 => 112,  341 => 110,  337 => 109,  331 => 108,  326 => 107,  322 => 106,  315 => 101,  312 => 100,  309 => 98,  306 => 97,  303 => 95,  299 => 93,  292 => 91,  286 => 88,  283 => 87,  277 => 83,  275 => 82,  270 => 79,  268 => 78,  263 => 75,  261 => 74,  254 => 73,  251 => 72,  247 => 71,  244 => 70,  242 => 69,  238 => 67,  235 => 66,  229 => 63,  225 => 61,  222 => 60,  220 => 59,  217 => 58,  211 => 55,  207 => 53,  204 => 52,  198 => 49,  194 => 47,  191 => 46,  185 => 43,  181 => 41,  178 => 40,  176 => 39,  173 => 38,  171 => 37,  168 => 36,  162 => 31,  159 => 30,  150 => 23,  145 => 21,  141 => 20,  137 => 19,  130 => 15,  126 => 13,  122 => 10,  112 => 9,  95 => 7,  79 => 5,  61 => 3,  44 => 1,);
+        return array (  751 => 307,  734 => 296,  721 => 285,  717 => 284,  712 => 283,  702 => 275,  699 => 274,  696 => 272,  691 => 269,  682 => 266,  679 => 265,  673 => 263,  671 => 262,  666 => 261,  664 => 260,  659 => 259,  657 => 258,  651 => 256,  648 => 255,  644 => 254,  639 => 251,  631 => 246,  629 => 245,  627 => 244,  624 => 243,  621 => 241,  617 => 239,  608 => 232,  584 => 209,  577 => 203,  570 => 199,  568 => 198,  558 => 195,  555 => 194,  553 => 193,  551 => 192,  548 => 191,  544 => 188,  539 => 185,  529 => 181,  523 => 180,  518 => 178,  514 => 177,  508 => 176,  503 => 175,  499 => 174,  492 => 169,  490 => 168,  487 => 167,  483 => 164,  478 => 161,  468 => 157,  462 => 156,  457 => 154,  453 => 153,  447 => 152,  442 => 151,  438 => 150,  431 => 145,  428 => 144,  425 => 142,  420 => 139,  410 => 135,  404 => 134,  399 => 132,  395 => 131,  389 => 130,  384 => 129,  380 => 128,  373 => 123,  370 => 122,  367 => 120,  362 => 117,  352 => 113,  346 => 112,  341 => 110,  337 => 109,  331 => 108,  326 => 107,  322 => 106,  315 => 101,  312 => 100,  309 => 98,  306 => 97,  303 => 95,  299 => 93,  292 => 91,  286 => 88,  283 => 87,  277 => 83,  275 => 82,  270 => 79,  268 => 78,  263 => 75,  261 => 74,  254 => 73,  251 => 72,  247 => 71,  244 => 70,  242 => 69,  238 => 67,  235 => 66,  229 => 63,  225 => 61,  222 => 60,  220 => 59,  217 => 58,  211 => 55,  207 => 53,  204 => 52,  198 => 49,  194 => 47,  191 => 46,  185 => 43,  181 => 41,  178 => 40,  176 => 39,  173 => 38,  171 => 37,  168 => 36,  162 => 31,  159 => 30,  150 => 23,  145 => 21,  141 => 20,  137 => 19,  130 => 15,  126 => 13,  122 => 10,  112 => 9,  95 => 7,  79 => 5,  61 => 3,  44 => 1,);
     }
 
     public function getSourceContext(): Source
@@ -1028,30 +1036,36 @@ class __TwigTemplate_f5319cee819cf1f27ce1444e7d5f2381 extends Template
     {% if not hasReservation %}
       {# Afficher les boutons normaux si on n'est pas dans la section Mess #}
       <a href=\"{{ path('employee_dashboard') }}\" class=\"footer-btn cancel-btn\" id=\"footer-cancel-btn\">
-        <img src=\"{{ asset('icons/cross-icon.png') }}\" alt=\"Annuler\" class=\"footer-icon\">
+        <span class=\"btn-text\">Annuler</span>
       </a>
       
-      <div class=\"lieux-icons\" id=\"lieux-icons\">
-      {% for lieu in lieusActifs %}
-        {% set lieuNameLower = lieu.name|lower %}
-        <div class=\"lieu-icon-wrapper\" data-lieu-id=\"{{ lieu.id }}\">
-          {% if lieuNameLower == 'restaurant' or lieuNameLower == 'sur place' %}
-            <img src=\"{{ asset('icons/chef-hat.png') }}\" alt=\"Sur place\" class=\"lieu-icon\" title=\"Sur place\">
-          {% elseif lieuNameLower|contains('emporter') or lieuNameLower|contains('à emporter') %}
-            <img src=\"{{ asset('icons/shopping-bag.png') }}\" alt=\"À emporter\" class=\"lieu-icon\" title=\"À emporter\">
-          {% elseif lieuNameLower|contains('livraison') or lieuNameLower|contains('bureau') or lieuNameLower|contains('delivery') %}
-            <img src=\"{{ asset('icons/Idelivery-truck.png') }}\" alt=\"Livraison\" class=\"lieu-icon\" title=\"Livraison\">
-          {% endif %}
+      {# Cadre Valider avec lieux #}
+      <div class=\"validate-container\" id=\"validate-container\">
+        <div class=\"validate-label\">Valider</div>
+        <div class=\"lieux-container\" id=\"lieux-container\">
+          {% for lieu in lieusActifs %}
+            {% set lieuNameLower = lieu.name|lower %}
+            <div class=\"lieu-item\" data-lieu-id=\"{{ lieu.id }}\">
+              <div class=\"lieu-icon-wrapper\">
+                {% if lieuNameLower == 'restaurant' or lieuNameLower == 'sur place' %}
+                  <img src=\"{{ asset('icons/chef-hat.png') }}\" alt=\"Sur place\" class=\"lieu-icon\">
+                {% elseif lieuNameLower|contains('emporter') or lieuNameLower|contains('à emporter') %}
+                  <img src=\"{{ asset('icons/shopping-bag.png') }}\" alt=\"À emporter\" class=\"lieu-icon\">
+                {% elseif lieuNameLower|contains('livraison') or lieuNameLower|contains('bureau') or lieuNameLower|contains('delivery') %}
+                  <img src=\"{{ asset('icons/Idelivery-truck.png') }}\" alt=\"Livraison\" class=\"lieu-icon\">
+                {% endif %}
+              </div>
+              <span class=\"lieu-label\">{{ lieu.name }}</span>
+            </div>
+          {% endfor %}
         </div>
-      {% endfor %}
       </div>
-      <button type=\"submit\" class=\"btn btn-primary validate-btn\" form=\"reservation-form\" id=\"footer-validate-btn\">Valider</button>
     {% endif %}
     
     {# Boutons pour la section Mess (cachés par défaut) #}
     <div class=\"mess-footer-buttons\" id=\"mess-footer-buttons\" style=\"display: none;\">
       <a href=\"{{ path('employee_dashboard') }}\" class=\"footer-btn cancel-btn\">
-        <img src=\"{{ asset('icons/cross-icon.png') }}\" alt=\"Annuler\" class=\"footer-icon\">
+        <span class=\"btn-text\">Annuler</span>
       </a>
       <button type=\"submit\" form=\"mess-form\" class=\"mess-submit-btn-footer\">Envoyer le message</button>
     </div>
@@ -1059,6 +1073,7 @@ class __TwigTemplate_f5319cee819cf1f27ce1444e7d5f2381 extends Template
 
   {# Formulaire caché pour la soumission #}
   <form method=\"post\" action=\"{{ path('employee_reserve_post') }}\" id=\"reservation-form\" style=\"display: none;\">
+    <input type=\"hidden\" name=\"_token\" value=\"{{ csrf_token('reservation') }}\">
     <input type=\"hidden\" name=\"date\" value=\"{{ date|date('Y-m-d') }}\">
     <input type=\"hidden\" name=\"formule\" id=\"form-formule\" value=\"\">
     <input type=\"hidden\" name=\"lieu\" id=\"form-lieu\" value=\"\">

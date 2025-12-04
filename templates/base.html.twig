@@ -27,8 +27,9 @@
             <a class="btn-nav {% if app.request.attributes.get('_route') == 'chef_reservations' %}active{% endif %}" href="{{ path('chef_reservations') }}">Réservations</a>
             <a class="btn-nav {% if app.request.attributes.get('_route') == 'chef_settings' %}active{% endif %}" href="{{ path('chef_settings') }}">Paramètres</a>
           {% else %}
-            <a class="btn-nav" href="{{ path('employee_dashboard') }}">Dashboard</a>
-            <a class="btn-nav" href="{{ path('employee_reservations') }}">Mes réservations</a>
+            <a class="btn-nav {% if app.request.attributes.get('_route') == 'employee_dashboard' %}active{% endif %}" href="{{ path('employee_dashboard') }}">Dashboard</a>
+            <a class="btn-nav {% if app.request.attributes.get('_route') == 'employee_reservations' %}active{% endif %}" href="{{ path('employee_reservations') }}">Mes réservations</a>
+            <a class="btn-nav {% if app.request.attributes.get('_route') == 'employee_account' %}active{% endif %}" href="{{ path('employee_account') }}">Mon compte</a>
           {% endif %}
           <a class="btn-nav btn-nav-logout" href="{{ path('app_logout') }}">Logout</a>
         {% else %}
@@ -57,8 +58,9 @@
             <a class="navbar-mobile-item {% if app.request.attributes.get('_route') == 'chef_reservations' %}active{% endif %}" href="{{ path('chef_reservations') }}">Réservations</a>
             <a class="navbar-mobile-item {% if app.request.attributes.get('_route') == 'chef_settings' %}active{% endif %}" href="{{ path('chef_settings') }}">Paramètres</a>
           {% else %}
-            <a class="navbar-mobile-item" href="{{ path('employee_dashboard') }}">Dashboard</a>
-            <a class="navbar-mobile-item" href="{{ path('employee_reservations') }}">Mes réservations</a>
+            <a class="navbar-mobile-item {% if app.request.attributes.get('_route') == 'employee_dashboard' %}active{% endif %}" href="{{ path('employee_dashboard') }}">Dashboard</a>
+            <a class="navbar-mobile-item {% if app.request.attributes.get('_route') == 'employee_reservations' %}active{% endif %}" href="{{ path('employee_reservations') }}">Mes réservations</a>
+            <a class="navbar-mobile-item {% if app.request.attributes.get('_route') == 'employee_account' %}active{% endif %}" href="{{ path('employee_account') }}">Mon compte</a>
           {% endif %}
           <a class="navbar-mobile-item navbar-mobile-item-logout" href="{{ path('app_logout') }}">Logout</a>
         {% else %}
