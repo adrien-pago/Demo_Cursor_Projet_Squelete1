@@ -1009,7 +1009,7 @@ Ajouter les nouvelles entries :
 
 ## Validation des formulaires
 - Montant de crédit : minimum 1€, maximum 1000€
-- Prix d'un menu du jour (CarteDuJour.price) : minimum 0.50€, maximum 50€
+- Prix d'un menu du jour (CarteDuJour.price) : minimum 0.50€, maximum 50
 - Date de réservation : ne peut pas être dans le passé
 - Date du menu du jour : peut être créé pour aujourd'hui et jours futurs uniquement
 - Vérification du solde avant réservation : solde >= CarteDuJour.price
@@ -1028,7 +1028,7 @@ Ajouter les nouvelles entries :
 # DONNÉES DE TEST (Fixtures optionnelles)
 
 ## Utilisateurs de test
-- Admin/Chef : `admin@test.com` / `Admin123!` (ROLE_CHEF, adminVerif: true)
+- Admin/Chef : `` / `Admin123!` (ROLE_CHEF, adminVerif: true)
 - Salarié : `user@test.com` / `User123!` (ROLE_EMPLOYEE, compteVerif: true, solde: 50€)
 
 ## Éléments de repas de test (sans prix - les prix sont au niveau du menu)
